@@ -5,6 +5,7 @@
  import { store } from '../../store';
 
  const meta: Meta<typeof Dashboard> = {
+ }
 -  title: 'Components/Dashboard',
 +  title: 'StorybookComponents/Dashboard',
    component: Dashboard,
