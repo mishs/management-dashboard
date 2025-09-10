@@ -6,7 +6,7 @@ import './index.css';
 async function startApp() {
   if (import.meta.env.DEV) {
     try {
-      const { worker } = await import('../mocks/browser.ts');
+      const { worker } = await import("./mocks/browser.ts");
       await worker.start({
         onUnhandledRequest: 'bypass',
       });
