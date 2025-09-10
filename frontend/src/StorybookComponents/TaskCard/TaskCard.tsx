@@ -1,19 +1,12 @@
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Box,
-  Avatar,
-  Stack,
-} from '@mui/material';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Task, PRIORITY_COLORS } from '../../types/task';
+import { useDraggable } from '@dnd-kit/core';
+import { Box, Card, CardContent, Typography, Chip, Stack } from '@mui/material';
+import { DragIndicator } from '@mui/icons-material';
+import { TaskWithSwimLane } from '../../types';
+import { formatDate } from '../../utils/taskHelpers';
 
 interface TaskCardProps {
-  task: Task;
+  task: TaskWithSwimLane;
   isDragging?: boolean;
 }
 
@@ -23,39 +16,64 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
     listeners,
     setNodeRef,
     transform,
-    transition,
-    isDragging: isSortableDragging,
-  } = useSortable({
-    id: task.id,
+    isDragging: isActiveDragging,
+  } = useDraggable({
+    id: task.id.toString(),
+    data: { task },
   });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging || isSortableDragging ? 0.5 : 1,
-  };
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        opacity: isDragging || isActiveDragging ? 0.5 : 1,
+      }
+    : undefined;
 
-  const priorityColor = task.priorityLevel ? PRIORITY_COLORS[task.priorityLevel] : '#757575';
+  const getPriorityColor = (priority: string | undefined) => {
+    switch (priority) {
+      case 'High':
+        return { backgroundColor: '#d32f2f', color: 'white' };
+      case 'Medium':
+        return { backgroundColor: '#eab308', color: '#212121' };
+      case 'Low':
+        return { backgroundColor: '#2e7d32', color: 'white' };
+      default:
+        return { backgroundColor: '#757575', color: 'white' };
+    }
+  };
 
   return (
     <Card
       ref={setNodeRef}
       style={style}
-      {...attributes}
       {...listeners}
+      {...attributes}
+      data-testid={`task-card-${task.id}`}
       sx={{
-        cursor: 'grab',
+        cursor: isDragging ? 'grabbing' : 'grab',
+        backgroundColor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'grey.200',
+        transition: 'box-shadow 0.2s ease-in-out',
         '&:hover': {
-          boxShadow: 4,
-        },
-        '&:active': {
-          cursor: 'grabbing',
+          boxShadow: 2,
         },
       }}
     >
       <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+        {/* Header Row */}
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="h4" component="h3" sx={{ flexGrow: 1, mr: 1 }}>
+          <Typography
+            variant="body2"
+            component="h3"
+            sx={{
+              fontWeight: 'medium',
+              color: 'text.primary',
+              fontSize: '0.875rem',
+              flex: 1,
+              mr: 1,
+            }}
+          >
             {task.taskName}
           </Typography>
           {task.priorityLevel && (
@@ -63,62 +81,92 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
               label={task.priorityLevel}
               size="small"
               sx={{
-                backgroundColor: priorityColor,
-                color: 'white',
+                ...getPriorityColor(task.priorityLevel),
                 fontSize: '0.75rem',
                 height: 20,
+                '& .MuiChip-label': {
+                  px: 1,
+                },
               }}
             />
           )}
         </Box>
 
+        {/* Description */}
         {task.description && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{
+              display: 'block',
+              mb: 1.5,
+              fontSize: '0.75rem',
+              lineHeight: 1.4,
+            }}
+          >
             {task.description}
           </Typography>
         )}
 
-        <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {task.assignee && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Avatar
-                  sx={{
-                    width: 24,
-                    height: 24,
-                    fontSize: '0.75rem',
-                    bgcolor: 'primary.main',
-                  }}
-                >
-                  {task.assignee.charAt(0)}
-                </Avatar>
-                <Typography variant="caption" color="text.secondary">
-                  {task.assignee}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-
-          {task.dueDate && (
-            <Typography variant="caption" color="text.secondary">
-              Due: {new Date(task.dueDate).toLocaleDateString()}
+        {/* Assignee */}
+        {task.assignee && (
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                backgroundColor: 'primary.main',
+                mr: 1,
+              }}
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+              {task.assignee}
             </Typography>
-          )}
-        </Stack>
-
-        {task.tags && task.tags.length > 0 && (
-          <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {task.tags.map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                size="small"
-                variant="outlined"
-                sx={{ fontSize: '0.7rem', height: 18 }}
-              />
-            ))}
           </Box>
         )}
+
+        {/* Due Date */}
+        {task.dueDate && (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5, fontSize: '0.75rem' }}>
+            Due: {formatDate(task.dueDate)}
+          </Typography>
+        )}
+
+        {/* Tags */}
+        {task.tags && task.tags.length > 0 && (
+          <Stack direction="row" spacing={0.5} sx={{ mb: 1.5, flexWrap: 'wrap', gap: 0.5 }}>
+            {task.tags.map((tag, index) => (
+              <Chip
+                key={index}
+                label={tag}
+                size="small"
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                  fontSize: '0.625rem',
+                  height: 18,
+                  '& .MuiChip-label': {
+                    px: 0.75,
+                  },
+                }}
+              />
+            ))}
+          </Stack>
+        )}
+
+        {/* Footer */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ fontSize: '0.75rem' }}
+            data-testid={`task-priority-${task.id}`}
+          >
+            Priority: {task.priority}
+          </Typography>
+          <DragIndicator sx={{ color: 'grey.300', fontSize: 16 }} />
+        </Box>
       </CardContent>
     </Card>
   );

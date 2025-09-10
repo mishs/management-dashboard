@@ -1,42 +1,33 @@
-import React, { useCallback } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Grid,
-  Paper,
-  CircularProgress,
-  Alert,
-} from '@mui/material';
+import React, { useCallback, useEffect } from 'react';
 import {
   DndContext,
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
-  closestCenter,
 } from '@dnd-kit/core';
+import { Box, Container, Typography, CircularProgress } from '@mui/material';
+import { toast } from 'sonner';
 import { SwimLane } from '../SwimLane/SwimLane';
 import { TaskCard } from '../TaskCard/TaskCard';
 import { StatisticsSection } from '../StatisticsSection/StatisticsSection';
 import { SavingIndicator } from '../SavingIndicator/SavingIndicator';
 import { useGetTasksQuery, useUpdateTasksMutation } from '../../store/api/tasksApi';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { setTasks, moveTask } from '../../store/slices/tasksSlice';
+import { setTasks, setActiveTask, setSaving, moveTask } from '../../store/slices/tasksSlice';
 import { calculateAffectedTasks } from '../../utils/taskHelpers';
-import { Task, SwimLane as SwimLaneEnum, SWIM_LANE_LABELS } from '../../types/task';
-import { toast } from 'sonner';
+import { TaskWithSwimLane, LANE_NAMES } from '../../types';
 
 export const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
-  const tasks = useAppSelector((state) => state.tasks.tasks);
-  const { data: fetchedTasks, isLoading, error } = useGetTasksQuery();
-  const [updateTasks, { isLoading: isUpdating }] = useUpdateTasksMutation();
+  const { tasks, activeTask, saving } = useAppSelector((state) => state.tasks);
   
-  const [activeTask, setActiveTask] = React.useState<Task | null>(null);
-
+  const { data: tasksData, isLoading, error } = useGetTasksQuery();
+  const [updateTasks] = useUpdateTasksMutation();
+  
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -45,135 +36,135 @@ export const Dashboard: React.FC = () => {
     })
   );
 
-  // Update local state when data is fetched
-  React.useEffect(() => {
-    if (fetchedTasks) {
-      dispatch(setTasks(fetchedTasks));
+  // Transform API data to include swimLane property
+  useEffect(() => {
+    if (tasksData) {
+      const transformedTasks: { [key: number]: TaskWithSwimLane[] } = {};
+      
+      Object.entries(tasksData).forEach(([laneId, laneTasks]) => {
+        transformedTasks[parseInt(laneId)] = laneTasks.map(task => ({
+          ...task,
+          swimLane: parseInt(laneId) as 1 | 2 | 3,
+        }));
+      });
+      
+      dispatch(setTasks(transformedTasks));
     }
-  }, [fetchedTasks, dispatch]);
+  }, [tasksData, dispatch]);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
-    const taskId = Number(active.id);
+    const taskId = parseInt(active.id as string);
     
-    // Find the task across all swim lanes
-    const task = Object.values(tasks)
-      .flat()
-      .find(t => t.id === taskId);
+    // Find the task across all lanes
+    let foundTask: TaskWithSwimLane | undefined;
+    Object.values(tasks).forEach(laneTasks => {
+      const task = laneTasks.find(t => t.id === taskId);
+      if (task) foundTask = task;
+    });
     
-    setActiveTask(task || null);
-  }, [tasks]);
+    if (foundTask) {
+      dispatch(setActiveTask(foundTask));
+    }
+  }, [tasks, dispatch]);
 
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
-    setActiveTask(null);
-
-    if (!over) return;
-
-    const taskId = Number(active.id);
-    const overId = String(over.id);
     
-    // Determine if we're dropping on a swim lane or a task
-    let destinationSwimLane: SwimLaneEnum;
-    let destinationIndex: number;
-
-    if (overId.startsWith('swimlane-')) {
-      // Dropping on a swim lane
-      destinationSwimLane = Number(overId.replace('swimlane-', '')) as SwimLaneEnum;
-      destinationIndex = tasks[destinationSwimLane].length;
-    } else {
-      // Dropping on a task - find which swim lane and position
-      const targetTask = Object.entries(tasks).find(([, taskList]) =>
-        taskList.some(task => task.id === Number(overId))
-      );
-      
-      if (!targetTask) return;
-      
-      destinationSwimLane = Number(targetTask[0]) as SwimLaneEnum;
-      destinationIndex = targetTask[1].findIndex(task => task.id === Number(overId));
-    }
-
-    // Find source swim lane
-    const sourceEntry = Object.entries(tasks).find(([, taskList]) =>
-      taskList.some(task => task.id === taskId)
+    dispatch(setActiveTask(null));
+    
+    if (!over) return;
+    
+    const taskId = parseInt(active.id as string);
+    const targetLaneId = parseInt(over.id as string);
+    
+    // Find source lane and task
+    let sourceLaneId: number | null = null;
+    let task: TaskWithSwimLane | undefined;
+    
+    Object.entries(tasks).forEach(([laneId, laneTasks]) => {
+      const foundTask = laneTasks.find(t => t.id === taskId);
+      if (foundTask) {
+        sourceLaneId = parseInt(laneId);
+        task = foundTask;
+      }
+    });
+    
+    if (!sourceLaneId || !task) return;
+    
+    // Calculate new priority (append to end of target lane)
+    const newPriority = tasks[targetLaneId].length + 1;
+    
+    // Calculate affected tasks
+    const affectedTasks = calculateAffectedTasks(
+      tasks,
+      taskId,
+      sourceLaneId,
+      targetLaneId,
+      newPriority
     );
     
-    if (!sourceEntry) return;
+    if (affectedTasks.length === 0) return;
     
-    const sourceSwimLane = Number(sourceEntry[0]) as SwimLaneEnum;
-
-    // Don't do anything if dropping in the same position
-    if (sourceSwimLane === destinationSwimLane) {
-      const currentIndex = tasks[sourceSwimLane].findIndex(task => task.id === taskId);
-      if (currentIndex === destinationIndex) return;
-    }
-
+    // Update local state optimistically
+    dispatch(moveTask({
+      taskId,
+      sourceLane: sourceLaneId,
+      targetLane: targetLaneId,
+      newPriority,
+    }));
+    
+    // Show saving indicator and persist to backend
+    dispatch(setSaving(true));
+    
     try {
-      // Optimistically update the UI
-      dispatch(moveTask({
-        taskId,
-        sourceSwimLane,
-        destinationSwimLane,
-        destinationIndex,
-      }));
-
-      // Calculate affected tasks for the API call
-      const affectedTasks = calculateAffectedTasks(
-        tasks,
-        taskId,
-        sourceSwimLane,
-        destinationSwimLane,
-        destinationIndex
-      );
-
-      // Update the backend
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       await updateTasks(affectedTasks).unwrap();
       
-      toast.success('Task moved successfully');
+      if (sourceLaneId !== targetLaneId) {
+        toast.success(`Task moved to ${LANE_NAMES[targetLaneId as keyof typeof LANE_NAMES]}`);
+      } else {
+        toast.success('Task priority updated');
+      }
     } catch (error) {
-      // Revert the optimistic update on error
-      dispatch(setTasks(fetchedTasks || tasks));
-      toast.error('Failed to move task. Please try again.');
+      toast.error('Failed to update task. Please try again.');
       console.error('Failed to update tasks:', error);
+    } finally {
+      dispatch(setSaving(false));
     }
-  }, [tasks, dispatch, updateTasks, fetchedTasks]);
+  }, [tasks, dispatch, updateTasks]);
 
   if (isLoading) {
     return (
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-          <CircularProgress size={60} />
-        </Box>
+      <Container maxWidth="xl" sx={{ py: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <CircularProgress />
       </Container>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Alert severity="error">
-          Failed to load tasks. Please refresh the page to try again.
-        </Alert>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Typography color="error" align="center">
+          Failed to load tasks. Please refresh the page.
+        </Typography>
       </Container>
     );
   }
 
-  const totalTasks = Object.values(tasks).reduce((sum, taskList) => sum + taskList.length, 0);
-
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 3, minHeight: '100vh' }} data-testid="dashboard">
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h1" component="h1" gutterBottom>
+        <Typography variant="h1" component="h1" sx={{ mb: 1 }}>
           My Fancy Task Dashboard
         </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Manage your tasks with drag and drop functionality
+        <Typography variant="body1" color="text.secondary" sx={{ mb: saving ? 1 : 0 }}>
+          Drag and drop tasks between swim lanes to update their status
         </Typography>
+        {saving && <SavingIndicator />}
       </Box>
-
-      <StatisticsSection tasks={tasks} />
-      
-      <SavingIndicator isVisible={isUpdating} />
 
       <DndContext
         sensors={sensors}
@@ -181,51 +172,27 @@ export const Dashboard: React.FC = () => {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <Grid container spacing={3} sx={{ mt: 2 }}>
-          {Object.entries(tasks).map(([swimLaneId, taskList]) => (
-            <Grid item xs={12} md={4} key={swimLaneId}>
-              <SwimLane
-                id={Number(swimLaneId) as SwimLaneEnum}
-                title={SWIM_LANE_LABELS[Number(swimLaneId) as SwimLaneEnum]}
-                tasks={taskList}
-                color={getSwimLaneColor(Number(swimLaneId) as SwimLaneEnum)}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: 'repeat(3, 1fr)' },
+            gap: 3,
+            mb: 4,
+          }}
+        >
+          <SwimLane laneId={1} tasks={tasks[1] || []} />
+          <SwimLane laneId={2} tasks={tasks[2] || []} />
+          <SwimLane laneId={3} tasks={tasks[3] || []} />
+        </Box>
 
         <DragOverlay>
           {activeTask ? (
-            <Paper elevation={8} sx={{ transform: 'rotate(5deg)' }}>
-              <TaskCard task={activeTask} isDragging />
-            </Paper>
+            <TaskCard task={activeTask} isDragging />
           ) : null}
         </DragOverlay>
       </DndContext>
 
-      {totalTasks === 0 && (
-        <Box sx={{ textAlign: 'center', mt: 8 }}>
-          <Typography variant="h4" color="text.secondary" gutterBottom>
-            No tasks yet
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Your tasks will appear here once they're loaded.
-          </Typography>
-        </Box>
-      )}
+      <StatisticsSection tasks={tasks} />
     </Container>
   );
 };
-
-function getSwimLaneColor(swimLane: SwimLaneEnum): string {
-  switch (swimLane) {
-    case SwimLaneEnum.TODO:
-      return '#1976d2';
-    case SwimLaneEnum.IN_PROGRESS:
-      return '#ff9800';
-    case SwimLaneEnum.COMPLETED:
-      return '#2e7d32';
-    default:
-      return '#757575';
-  }
-}
