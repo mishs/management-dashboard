@@ -9,7 +9,7 @@ export default defineConfig({
     host: true,
   },
   optimizeDeps: {
-    include: ['react-redux', '@reduxjs/toolkit'],
+    include: ['react-redux', '@reduxjs/toolkit'],  // Add redux toolkit just in case
   },
   resolve: {
     alias: {
