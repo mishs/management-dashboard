@@ -4,7 +4,7 @@ import { Task, TasksResponse, TaskWithSwimLane } from '../../types';
 export const tasksApi = createApi({
   reducerPath: 'tasksApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: '/api',
+    baseUrl: import.meta.env.DEV ? '/api' : '/api',
     prepareHeaders: (headers) => {
       console.log('🔍 Making API request to:', '/api');
       return headers;

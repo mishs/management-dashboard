@@ -10,6 +10,7 @@ async function startApp() {
       const { worker } = await import('./mocks/browser');
       // Start the service worker; set explicit URL if your base path is not root
       await worker.start({
+        onUnhandledRequest: 'bypass',
         serviceWorker: {
           url: `${import.meta.env.BASE_URL}mockServiceWorker.js`,
         },

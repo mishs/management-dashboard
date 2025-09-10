@@ -105,6 +105,7 @@ let tasks = { ...mockTasks };
 export const handlers = [
   http.get('/api/tasks', () => {
     console.log('🎯 MSW: GET /api/tasks intercepted');
+    console.log('📦 MSW: Returning mock tasks data');
     return HttpResponse.json(tasks);
   }),
   
