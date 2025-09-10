@@ -25,6 +25,7 @@ This backend runs in a service worker located in the public folder. Please do no
 
 - In the Mock folder you'll find a mockup of the dashboard as well as of the re-prioritization process.
 - Feel free to style the dashboard according to your esthetical requirements while sticking to the layout of the mockup.
+- use Storybook for the components.
 
 ### Mock Backend
 
