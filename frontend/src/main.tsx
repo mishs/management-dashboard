@@ -3,17 +3,24 @@ import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-async function enableMocking() {
+async function startApp() {
   if (import.meta.env.DEV) {
-    const { worker } = await import('../../backend/create-backend.ts');
-    return worker.start();
+    try {
+      const { worker } = await import('../../backend/create-backend.ts');
+      await worker.start({
+        onUnhandledRequest: 'bypass',
+      });
+      console.log('MSW started successfully');
+    } catch (error) {
+      console.warn('MSW failed to start:', error);
+    }
   }
-}
 
-enableMocking().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />
     </React.StrictMode>,
   );
-});
+}
+
+startApp();
