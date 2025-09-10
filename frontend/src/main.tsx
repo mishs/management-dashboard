@@ -13,7 +13,6 @@ async function startApp() {
         serviceWorker: {
           url: `${import.meta.env.BASE_URL}mockServiceWorker.js`,
         },
-        onUnhandledRequest: 'bypass',
       });
       console.log('🚀 MSW started successfully');
     } catch (error) {
