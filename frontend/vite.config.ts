@@ -8,12 +8,12 @@ export default defineConfig({
     port: 5173,
     host: true,
   },
+  optimizeDeps: {
+    include: ['react-redux', '@reduxjs/toolkit'],
+  },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'), // optional: for cleaner imports
+      '@': path.resolve(__dirname, './src'),
     },
-  },
-  optimizeDeps: {
-    include: ['react-redux', '@reduxjs/toolkit'], // ensure react-redux is pre-bundled
   },
 });
