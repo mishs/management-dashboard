@@ -1,18 +1,17 @@
 import type { Preview } from '@storybook/react';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-import { withThemeFromJSXProvider } from '@storybook/addon-styling';
+import React from 'react';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { theme } from '../src/theme';
+import '../src/index.css';
 
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-});
+export const decorators = [
+  (Story) => (
+    React.createElement(ThemeProvider, { theme },
+      React.createElement(CssBaseline),
+      React.createElement(Story)
+    )
+  ),
+];
 
 const preview: Preview = {
   parameters: {
@@ -23,17 +22,20 @@ const preview: Preview = {
         date: /Date$/,
       },
     },
+    backgrounds: {
+      default: 'light',
+      values: [
+        {
+          name: 'light',
+          value: '#f5f5f5',
+        },
+        {
+          name: 'white',
+          value: '#ffffff',
+        },
+      ],
+    },
   },
-  decorators: [
-    withThemeFromJSXProvider({
-      themes: {
-        light: theme,
-      },
-      defaultTheme: 'light',
-      Provider: ThemeProvider,
-      GlobalStyles: CssBaseline,
-    }),
-  ],
 };
 
 export default preview;
