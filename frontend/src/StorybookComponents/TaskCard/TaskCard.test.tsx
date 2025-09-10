@@ -1,15 +1,17 @@
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TaskCard } from './TaskCard';
 import { DndContext } from '@dnd-kit/core';
-import { Task } from '../../types/task';
+import { TaskWithSwimLane } from '../../types/index';
 
-const mockTask: Task = {
+const mockTask: TaskWithSwimLane = {
   id: 1,
   taskName: 'Test Task',
   priority: 1,
+  swimLane: 1,
 };
 
-const renderTaskCard = (task: Task = mockTask, swimLane: number = 1) => {
+const renderTaskCard = (task: TaskWithSwimLane = mockTask, swimLane: number = 1) => {
   return render(
     <DndContext onDragEnd={() => {}}>
       <TaskCard task={task} swimLane={swimLane} />

@@ -125,16 +125,16 @@ export const handlers = [
         // Find the task in all swim lanes and update it
         Object.keys(tasks).forEach((laneKey) => {
           const lane = parseInt(laneKey);
-          const taskIndex = tasks[lane].findIndex(task => task.id === updatedTask.id);
+          const taskIndex = (tasks as any)[lane].findIndex((task: any) => task.id === updatedTask.id);
           
           if (taskIndex !== -1) {
             // Remove from current lane if moving to different lane
             if (lane !== updatedTask.swimLane) {
-              tasks[lane].splice(taskIndex, 1);
+              (tasks as any)[lane].splice(taskIndex, 1);
             } else {
               // Update in same lane
-              tasks[lane][taskIndex] = {
-                ...tasks[lane][taskIndex],
+              (tasks as any)[lane][taskIndex] = {
+                ...(tasks as any)[lane][taskIndex],
                 ...updatedTask
               };
             }
@@ -142,10 +142,10 @@ export const handlers = [
         });
         
         // Add to new lane if moving
-        if (!tasks[updatedTask.swimLane].find(task => task.id === updatedTask.id)) {
-          const originalTask = Object.values(mockTasks).flat().find(task => task.id === updatedTask.id);
+        if (!(tasks as any)[updatedTask.swimLane].find((task: any) => task.id === updatedTask.id)) {
+          const originalTask = Object.values(mockTasks).flat().find((task: any) => task.id === updatedTask.id);
           if (originalTask) {
-            tasks[updatedTask.swimLane].push({
+            (tasks as any)[updatedTask.swimLane].push({
               ...originalTask,
               ...updatedTask
             });
@@ -156,7 +156,7 @@ export const handlers = [
       // Sort tasks by priority in each lane
       Object.keys(tasks).forEach((laneKey) => {
         const lane = parseInt(laneKey);
-        tasks[lane].sort((a, b) => a.priority - b.priority);
+        (tasks as any)[lane].sort((a: any, b: any) => a.priority - b.priority);
       });
       
       console.log('✅ MSW: Tasks updated successfully');

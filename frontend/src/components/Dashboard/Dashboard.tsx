@@ -42,7 +42,7 @@ export const Dashboard: React.FC = () => {
       const transformedTasks: { [key: number]: TaskWithSwimLane[] } = {};
       
       Object.entries(tasksData).forEach(([laneId, laneTasks]) => {
-        transformedTasks[parseInt(laneId)] = laneTasks.map(task => ({
+        transformedTasks[parseInt(laneId)] = (laneTasks as any[]).map((task: any) => ({
           ...task,
           swimLane: parseInt(laneId) as 1 | 2 | 3,
         }));

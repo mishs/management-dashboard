@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Task, TasksResponse, TaskWithSwimLane } from '../../types';
+import { TasksResponse, TaskWithSwimLane } from '../../types/index';
 
 export const tasksApi = createApi({
   reducerPath: 'tasksApi',
