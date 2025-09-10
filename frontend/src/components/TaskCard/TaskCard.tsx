@@ -106,13 +106,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
             variant="caption"
             color="text.secondary"
             sx={{
-              display: 'block',
-              mb: 1.5,
               fontSize: '0.75rem',
               lineHeight: 1.4,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               display: '-webkit-box',
+              mb: 1.5,
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
             }}
