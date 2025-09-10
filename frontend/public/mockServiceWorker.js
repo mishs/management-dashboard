@@ -208,7 +208,7 @@ async function getResponse(event, client, requestId) {
     // This prevents request alteration and also keeps it compliant with the
     // user-defined CORS policies.
     const acceptHeader = headers.get('accept')
-    if (acceptHeader) {
+    if (acceptHeader && typeof acceptHeader === 'string') {
       const values = acceptHeader.split(',').map((value) => value.trim())
       const filteredValues = values.filter(
         (value) => value !== 'msw/passthrough',
