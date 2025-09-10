@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { Toaster } from 'sonner';
-import { Dashboard } from './components/Dashboard/Dashboard';
+import { Dashboard } from './StorybookComponents/Dashboard/Dashboard';
 import { store } from './store';
 import { theme } from './theme';
 
