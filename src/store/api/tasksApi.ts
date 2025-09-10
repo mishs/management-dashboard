@@ -1,22 +1,22 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { TasksState, UpdateTaskPayload } from '../../types/task';
+import { Task, UpdateTaskPayload } from '../../types/task';
 
 export const tasksApi = createApi({
   reducerPath: 'tasksApi',
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['Tasks'],
+  tagTypes: ['Task'],
   endpoints: (builder) => ({
-    getTasks: builder.query<TasksState, void>({
+    getTasks: builder.query<Record<number, Task[]>, void>({
       query: () => '/tasks',
-      providesTags: ['Tasks'],
+      providesTags: ['Task'],
     }),
-    updateTasks: builder.mutation<{ status: number }, UpdateTaskPayload[]>({
+    updateTasks: builder.mutation<void, UpdateTaskPayload[]>({
       query: (tasks) => ({
         url: '/tasks',
         method: 'POST',
         body: tasks,
       }),
-      invalidatesTags: ['Tasks'],
+      invalidatesTags: ['Task'],
     }),
   }),
 });
