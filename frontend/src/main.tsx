@@ -6,7 +6,7 @@ import './index.css';
 // Start the mock service worker
 async function enableMocking() {
   if (typeof window !== 'undefined') {
-    const { worker } = await import('../to-do-ndiroinopisa/backend/create-backend.ts');
+    const { worker } = await import('../../backend/create-backend.ts');
     return worker.start();
   }
 }

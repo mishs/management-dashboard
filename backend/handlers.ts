@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { Tasks } from './tasks';
+import { Tasks } from './tasks.ts';
 
 const tasksInstance = new Tasks();
 export const handlers = [
