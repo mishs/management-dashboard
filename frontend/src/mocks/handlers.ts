@@ -104,13 +104,13 @@ let tasks = { ...mockTasks };
 
 export const handlers = [
   http.get('/api/tasks', () => {
-    console.log('MSW: GET /api/tasks called');
+    console.log('🎯 MSW: GET /api/tasks intercepted');
     return HttpResponse.json(tasks);
   }),
   
   http.post('/api/tasks', async ({ request }) => {
     try {
-      console.log('MSW: POST /api/tasks called');
+      console.log('🎯 MSW: POST /api/tasks intercepted');
       const updatedTasks = await request.json() as Array<{
         id: number;
         taskName: string;
@@ -118,7 +118,7 @@ export const handlers = [
         swimLane: number;
       }>;
       
-      console.log('MSW: Updating tasks:', updatedTasks);
+      console.log('📝 MSW: Updating tasks:', updatedTasks);
       
       // Update tasks based on the payload
       updatedTasks.forEach((updatedTask) => {
@@ -159,10 +159,10 @@ export const handlers = [
         tasks[lane].sort((a, b) => a.priority - b.priority);
       });
       
-      console.log('MSW: Tasks updated successfully');
+      console.log('✅ MSW: Tasks updated successfully');
       return HttpResponse.json({ status: 201 });
     } catch (error) {
-      console.error('MSW: Error updating tasks:', error);
+      console.error('❌ MSW: Error updating tasks:', error);
       return new HttpResponse(null, {
         status: 400,
         statusText: (error as Error).message,

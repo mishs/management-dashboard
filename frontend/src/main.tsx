@@ -8,11 +8,11 @@ async function startApp() {
     try {
       const { worker } = await import("./mocks/browser.ts");
       await worker.start({
-        onUnhandledRequest: 'bypass',
+        onUnhandledRequest: "bypass",
       });
-      console.log('MSW started successfully');
+      console.log('🚀 MSW started successfully');
     } catch (error) {
-      console.warn('MSW failed to start:', error);
+      console.error('❌ MSW failed to start:', error);
     }
   }
 
