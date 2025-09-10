@@ -26,6 +26,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
         opacity: isDragging || isActiveDragging ? 0.5 : 1,
+        zIndex: isDragging || isActiveDragging ? 1000 : 'auto',
       }
     : undefined;
 
@@ -55,8 +56,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
         border: '1px solid',
         borderColor: 'grey.200',
         transition: 'box-shadow 0.2s ease-in-out',
+        borderRadius: 2,
         '&:hover': {
           boxShadow: 2,
+          borderColor: 'primary.light',
+        },
+        '&:active': {
+          transform: 'scale(1.02)',
         },
       }}
     >
@@ -72,6 +78,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
               fontSize: '0.875rem',
               flex: 1,
               mr: 1,
+              lineHeight: 1.4,
             }}
           >
             {task.taskName}
@@ -84,6 +91,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
                 ...getPriorityColor(task.priorityLevel),
                 fontSize: '0.75rem',
                 height: 20,
+                borderRadius: 1,
                 '& .MuiChip-label': {
                   px: 1,
                 },
@@ -102,6 +110,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
               mb: 1.5,
               fontSize: '0.75rem',
               lineHeight: 1.4,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
             }}
           >
             {task.description}
@@ -146,6 +159,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
                   color: 'white',
                   fontSize: '0.625rem',
                   height: 18,
+                  borderRadius: 1,
                   '& .MuiChip-label': {
                     px: 0.75,
                   },
@@ -165,7 +179,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
           >
             Priority: {task.priority}
           </Typography>
-          <DragIndicator sx={{ color: 'grey.300', fontSize: 16 }} />
+          <DragIndicator 
+            sx={{ 
+              color: 'grey.400', 
+              fontSize: 16,
+              transition: 'color 0.2s ease-in-out',
+              '&:hover': {
+                color: 'primary.main',
+              },
+            }} 
+          />
         </Box>
       </CardContent>
     </Card>

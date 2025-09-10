@@ -33,7 +33,7 @@ const meta: Meta<typeof TaskCard> = {
     (Story) => (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <DndContext>
+        <DndContext onDragEnd={() => {}}>
           <Box sx={{ maxWidth: 300 }}>
             <Story />
           </Box>

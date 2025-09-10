@@ -35,6 +35,18 @@ export const theme = createTheme({
       primary: '#212121',
       secondary: '#757575',
     },
+    grey: {
+      50: '#fafafa',
+      100: '#f5f5f5',
+      200: '#eeeeee',
+      300: '#e0e0e0',
+      400: '#bdbdbd',
+      500: '#9e9e9e',
+      600: '#757575',
+      700: '#616161',
+      800: '#424242',
+      900: '#212121',
+    },
   },
   typography: {
     fontFamily: '"Inter", system-ui, Avenir, Helvetica, Arial, sans-serif',
@@ -42,31 +54,37 @@ export const theme = createTheme({
       fontSize: '1.5rem',
       fontWeight: 600,
       color: '#212121',
+      lineHeight: 1.2,
     },
     h2: {
       fontSize: '1.125rem',
       fontWeight: 500,
       color: '#212121',
+      lineHeight: 1.3,
     },
     h4: {
       fontSize: '1rem',
       fontWeight: 500,
       color: '#212121',
+      lineHeight: 1.4,
     },
     body1: {
       fontSize: '1rem',
       fontWeight: 400,
       color: '#212121',
+      lineHeight: 1.5,
     },
     body2: {
       fontSize: '0.875rem',
       fontWeight: 400,
       color: '#757575',
+      lineHeight: 1.4,
     },
     caption: {
       fontSize: '0.75rem',
       fontWeight: 400,
       color: '#757575',
+      lineHeight: 1.3,
     },
   },
   components: {
@@ -74,6 +92,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+          borderRadius: '8px',
           '&:hover': {
             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
           },
@@ -83,9 +102,28 @@ export const theme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: '0.25rem',
+          borderRadius: '4px',
         },
       },
     },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: '8px',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: '8px',
+          textTransform: 'none',
+          fontWeight: 500,
+        },
+      },
+    },
+  },
+  shape: {
+    borderRadius: 8,
   },
 });

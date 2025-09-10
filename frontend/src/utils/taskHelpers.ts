@@ -117,3 +117,16 @@ export const formatDate = (dateString: string): string => {
     day: 'numeric',
   });
 };
+
+export const isValidTaskMove = (
+  tasks: { [key: number]: TaskWithSwimLane[] },
+  taskId: number,
+  sourceLane: number
+): boolean => {
+  return tasks[sourceLane]?.some(task => task.id === taskId) || false;
+};
+
+export const getNextPriority = (tasks: TaskWithSwimLane[]): number => {
+  if (tasks.length === 0) return 1;
+  return Math.max(...tasks.map(task => task.priority)) + 1;
+};

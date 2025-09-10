@@ -31,6 +31,7 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
           backgroundColor: 'background.paper',
           border: '1px solid',
           borderColor: 'grey.200',
+          borderRadius: 2,
         }}
       >
         {/* Lane Title and Count */}
@@ -55,6 +56,8 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
               backgroundColor: 'primary.main',
               color: 'white',
               fontWeight: 'medium',
+              minWidth: 32,
+              height: 24,
             }}
             data-testid={`lane-task-count-${laneId}`}
           />
@@ -70,6 +73,10 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
                 p: 1,
                 borderRadius: 1,
                 textAlign: 'center',
+                minHeight: 32,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Typography variant="caption" sx={{ fontSize: '0.75rem', fontWeight: 'medium' }}>
@@ -85,6 +92,10 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
                 p: 1,
                 borderRadius: 1,
                 textAlign: 'center',
+                minHeight: 32,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Typography variant="caption" sx={{ fontSize: '0.75rem', fontWeight: 'medium' }}>
@@ -100,6 +111,10 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
                 p: 1,
                 borderRadius: 1,
                 textAlign: 'center',
+                minHeight: 32,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Typography variant="caption" sx={{ fontSize: '0.75rem', fontWeight: 'medium' }}>
@@ -122,6 +137,9 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
           backgroundColor: isOver ? 'primary.light' : 'grey.50',
           borderRadius: 2,
           transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            borderColor: isOver ? 'primary.main' : 'grey.400',
+          },
         }}
       >
         {tasks.length === 0 ? (
@@ -132,9 +150,27 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
               justifyContent: 'center',
               height: 200,
               color: 'text.secondary',
+              flexDirection: 'column',
+              gap: 1,
             }}
             data-testid={`empty-lane-${laneId}`}
           >
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: '50%',
+                backgroundColor: 'grey.200',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: 1,
+              }}
+            >
+              <Typography variant="h4" color="text.secondary">
+                +
+              </Typography>
+            </Box>
             <Typography variant="body2">
               Drop tasks here
             </Typography>

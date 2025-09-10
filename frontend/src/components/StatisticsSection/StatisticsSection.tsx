@@ -24,6 +24,14 @@ export const StatisticsSection: React.FC<StatisticsSectionProps> = ({ tasks }) =
         p: 2,
         borderRadius: 2,
         textAlign: 'center',
+        border: '1px solid',
+        borderColor: 'grey.200',
+        transition: 'all 0.2s ease-in-out',
+        '&:hover': {
+          backgroundColor: 'grey.100',
+          transform: 'translateY(-2px)',
+          boxShadow: 1,
+        },
       }}
       data-testid={testId}
     >
@@ -58,6 +66,7 @@ export const StatisticsSection: React.FC<StatisticsSectionProps> = ({ tasks }) =
         backgroundColor: 'background.paper',
         border: '1px solid',
         borderColor: 'grey.200',
+        borderRadius: 2,
       }}
     >
       {/* Header */}

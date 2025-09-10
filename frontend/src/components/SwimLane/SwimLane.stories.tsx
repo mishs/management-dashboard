@@ -46,7 +46,7 @@ const meta: Meta<typeof SwimLane> = {
     (Story) => (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <DndContext>
+        <DndContext onDragEnd={() => {}}>
           <Box sx={{ maxWidth: 400 }}>
             <Story />
           </Box>

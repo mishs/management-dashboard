@@ -118,9 +118,6 @@ export const Dashboard: React.FC = () => {
     dispatch(setSaving(true));
     
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
       await updateTasks(affectedTasks).unwrap();
       
       if (sourceLaneId !== targetLaneId) {
