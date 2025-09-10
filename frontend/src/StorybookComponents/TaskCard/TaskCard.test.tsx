@@ -11,10 +11,10 @@ const mockTask: TaskWithSwimLane = {
   swimLane: 1,
 };
 
-const renderTaskCard = (task: TaskWithSwimLane = mockTask, swimLane: number = 1) => {
+const renderTaskCard = (task: TaskWithSwimLane = mockTask) => {
   return render(
     <DndContext onDragEnd={() => {}}>
-      <TaskCard task={task} swimLane={swimLane} />
+      <TaskCard task={task} />
     </DndContext>
   );
 };
@@ -27,26 +27,29 @@ describe('TaskCard', () => {
 
   it('displays priority number', () => {
     renderTaskCard();
-    expect(screen.getByText('#1')).toBeInTheDocument();
+    expect(screen.getByTestId('task-priority-1')).toBeInTheDocument();
+    expect(screen.getByTestId('task-priority-1')).toHaveTextContent('Priority: 1');
   });
 
   it('renders with correct priority for different tasks', () => {
-    const highPriorityTask: Task = {
+    const highPriorityTask: TaskWithSwimLane = {
       id: 2,
       taskName: 'High Priority Task',
       priority: 10,
+      swimLane: 1,
     };
     
     renderTaskCard(highPriorityTask);
     expect(screen.getByText('High Priority Task')).toBeInTheDocument();
-    expect(screen.getByText('#10')).toBeInTheDocument();
+    expect(screen.getByTestId('task-priority-2')).toBeInTheDocument();
   });
 
   it('handles long task names', () => {
-    const longNameTask: Task = {
+    const longNameTask: TaskWithSwimLane = {
       id: 3,
       taskName: 'This is a very long task name that should be handled properly by the component',
       priority: 5,
+      swimLane: 1,
     };
     
     renderTaskCard(longNameTask);
