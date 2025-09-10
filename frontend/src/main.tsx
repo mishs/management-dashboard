@@ -3,9 +3,8 @@ import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-// Start the mock service worker
 async function enableMocking() {
-  if (typeof window !== 'undefined') {
+  if (import.meta.env.DEV) {
     const { worker } = await import('../../backend/create-backend.ts');
     return worker.start();
   }
