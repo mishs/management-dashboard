@@ -27,19 +27,28 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
         opacity: isDragging || isActiveDragging ? 0.5 : 1,
         zIndex: isDragging || isActiveDragging ? 1000 : 'auto',
+        fontFamily: 'Inter, Roboto, sans-serif',
+        boxShadow: isDragging ? '0 4px 16px rgba(0,0,0,0.10)' : '0 2px 8px rgba(0,0,0,0.04)',
+        border: '1.5px solid var(--gray-200)',
+        borderRadius: '12px',
       }
-    : undefined;
+    : {
+        fontFamily: 'Inter, Roboto, sans-serif',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        border: '1.5px solid var(--gray-200)',
+        borderRadius: '12px',
+      };
 
   const getPriorityColor = (priority: string | undefined) => {
     switch (priority) {
       case 'High':
-        return { backgroundColor: '#d32f2f', color: 'white' };
+        return { backgroundColor: 'var(--priority-high-bg)', color: 'var(--priority-high-text)' };
       case 'Medium':
-        return { backgroundColor: '#eab308', color: '#212121' };
+        return { backgroundColor: 'var(--priority-medium-bg)', color: 'var(--priority-medium-text)' };
       case 'Low':
-        return { backgroundColor: '#2e7d32', color: 'white' };
+        return { backgroundColor: 'var(--priority-low-bg)', color: 'var(--priority-low-text)' };
       default:
-        return { backgroundColor: '#757575', color: 'white' };
+        return { backgroundColor: 'var(--gray-500)', color: 'var(--priority-high-text)' };
     }
   };
 
@@ -66,16 +75,21 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
         },
       }}
     >
-      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+  <CardContent sx={{ p: 3, '&:last-child': { pb: 3 }, fontFamily: 'Inter, Roboto, sans-serif', gap: 2 }}>
         {/* Header Row */}
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+          {/* Grip Handle */}
+          <Box sx={{ width: 16, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1 }}>
+            <Box sx={{ width: 4, height: 24, borderRadius: 2, background: 'var(--gray-300)', opacity: 0.7 }} />
+          </Box>
           <Typography
             variant="body2"
             component="h3"
             sx={{
-              fontWeight: 'medium',
-              color: 'text.primary',
-              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--gray-950)',
+              fontSize: '0.96rem',
+              textShadow: '0 1px 2px rgba(0,0,0,0.08)',
               flex: 1,
               mr: 1,
               lineHeight: 1.4,

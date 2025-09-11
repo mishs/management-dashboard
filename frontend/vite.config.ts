@@ -4,12 +4,9 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  optimizeDeps: {
-    include: ['react-redux', '@reduxjs/toolkit'],  // Add redux toolkit just in case
-  },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': __dirname + '/src',
     },
   },
 });

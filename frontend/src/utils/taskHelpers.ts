@@ -1,16 +1,15 @@
 import { TaskWithSwimLane } from '../types';
 
 export const calculateAffectedTasks = (
-  tasks: { [key: number]: TaskWithSwimLane[] },
+  tasks: TaskWithSwimLane[],
   movedTaskId: number,
   sourceLane: number,
   targetLane: number,
   newPosition: number
 ): Partial<TaskWithSwimLane>[] => {
   const affectedTasks: Partial<TaskWithSwimLane>[] = [];
-  
   // Find the moved task
-  const movedTask = tasks[sourceLane].find(task => task.id === movedTaskId);
+  const movedTask = tasks.find(task => task.id === movedTaskId);
   if (!movedTask) return affectedTasks;
   
   // If moving to a different lane
@@ -24,8 +23,8 @@ export const calculateAffectedTasks = (
     });
     
     // Update priorities in source lane (tasks after the moved task)
-    tasks[sourceLane]
-      .filter(task => task.id !== movedTaskId && task.priority > movedTask.priority)
+    tasks
+      .filter(task => task.swimLane === sourceLane && task.id !== movedTaskId && task.priority > movedTask.priority)
       .forEach(task => {
         affectedTasks.push({
           id: task.id,
@@ -36,8 +35,8 @@ export const calculateAffectedTasks = (
       });
     
     // Update priorities in target lane (tasks at and after the new position)
-    tasks[targetLane]
-      .filter(task => task.priority >= newPosition)
+    tasks
+      .filter(task => task.swimLane === targetLane && task.priority >= newPosition)
       .forEach(task => {
         affectedTasks.push({
           id: task.id,
@@ -62,8 +61,8 @@ export const calculateAffectedTasks = (
     
     if (oldPosition < newPosition) {
       // Moving down: shift tasks up
-      tasks[sourceLane]
-        .filter(task => task.id !== movedTaskId && task.priority > oldPosition && task.priority <= newPosition)
+      tasks
+        .filter(task => task.swimLane === sourceLane && task.id !== movedTaskId && task.priority > oldPosition && task.priority <= newPosition)
         .forEach(task => {
           affectedTasks.push({
             id: task.id,
@@ -74,8 +73,8 @@ export const calculateAffectedTasks = (
         });
     } else {
       // Moving up: shift tasks down
-      tasks[sourceLane]
-        .filter(task => task.id !== movedTaskId && task.priority >= newPosition && task.priority < oldPosition)
+      tasks
+        .filter(task => task.swimLane === sourceLane && task.id !== movedTaskId && task.priority >= newPosition && task.priority < oldPosition)
         .forEach(task => {
           affectedTasks.push({
             id: task.id,

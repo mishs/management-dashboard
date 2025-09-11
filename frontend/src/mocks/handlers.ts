@@ -120,28 +120,29 @@ export const handlers = [
       updatedTasks.forEach((updatedTask) => {
         // Find the task in all swim lanes and update it
         Object.keys(tasks).forEach((laneKey) => {
-          const lane = parseInt(laneKey);
-          const taskIndex = tasks[lane].findIndex(task => task.id === updatedTask.id);
-          
+          const lane = laneKey;
+          const laneTasks = (tasks as any)[lane];
+          const taskIndex = laneTasks.findIndex((task: any) => task.id === updatedTask.id);
           if (taskIndex !== -1) {
             // Remove from current lane if moving to different lane
-            if (lane !== updatedTask.swimLane) {
-              tasks[lane].splice(taskIndex, 1);
+            if (parseInt(lane) !== updatedTask.swimLane) {
+              laneTasks.splice(taskIndex, 1);
             } else {
               // Update in same lane
-              tasks[lane][taskIndex] = {
-                ...tasks[lane][taskIndex],
+              laneTasks[taskIndex] = {
+                ...laneTasks[taskIndex],
                 ...updatedTask
               };
             }
           }
         });
-        
         // Add to new lane if moving
-        if (!tasks[updatedTask.swimLane].find(task => task.id === updatedTask.id)) {
-          const originalTask = Object.values(mockTasks).flat().find(task => task.id === updatedTask.id);
+        const targetLane = String(updatedTask.swimLane);
+        const targetLaneTasks = (tasks as any)[targetLane];
+        if (!targetLaneTasks.find((task: any) => task.id === updatedTask.id)) {
+          const originalTask = Object.values(mockTasks).flat().find((task: any) => task.id === updatedTask.id);
           if (originalTask) {
-            tasks[updatedTask.swimLane].push({
+            targetLaneTasks.push({
               ...originalTask,
               ...updatedTask
             });
@@ -151,11 +152,11 @@ export const handlers = [
       
       // Sort tasks by priority in each lane
       Object.keys(tasks).forEach((laneKey) => {
-        const lane = parseInt(laneKey);
-        tasks[lane].sort((a, b) => a.priority - b.priority);
+        const laneTasks = (tasks as any)[laneKey];
+        laneTasks.sort((a: any, b: any) => a.priority - b.priority);
       });
-      
-      return HttpResponse.json({ status: 201 });
+      // Return updated tasks so frontend can sync
+      return HttpResponse.json(tasks);
     } catch (error) {
       return new HttpResponse(null, {
         status: 400,

@@ -1,16 +1,16 @@
 import React from 'react';
-import { Box, Paper, Typography, Grid } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import { TaskWithSwimLane, LANE_NAMES, LANE_COLORS } from '../../types';
 
 interface StatisticsSectionProps {
-  tasks: { [key: number]: TaskWithSwimLane[] };
+  tasks: TaskWithSwimLane[];
 }
 
 export const StatisticsSection: React.FC<StatisticsSectionProps> = ({ tasks }) => {
-  const totalTasks = Object.values(tasks).reduce((sum, laneTasks) => sum + laneTasks.length, 0);
-  const todoCount = tasks[1]?.length || 0;
-  const inProgressCount = tasks[2]?.length || 0;
-  const completedCount = tasks[3]?.length || 0;
+  const totalTasks = tasks.length;
+  const todoCount = tasks.filter(t => t.swimLane === 1).length;
+  const inProgressCount = tasks.filter(t => t.swimLane === 2).length;
+  const completedCount = tasks.filter(t => t.swimLane === 3).length;
 
   const StatCard: React.FC<{
     title: string;
@@ -63,14 +63,15 @@ export const StatisticsSection: React.FC<StatisticsSectionProps> = ({ tasks }) =
       sx={{
         p: 3,
         mt: 4,
-        backgroundColor: 'background.paper',
+        backgroundColor: 'var(--mui-bg-paper)',
         border: '1px solid',
-        borderColor: 'grey.200',
+        borderColor: 'var(--gray-200)',
         borderRadius: 2,
+        fontFamily: 'Inter, Roboto, sans-serif',
       }}
     >
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, fontFamily: 'Inter, Roboto, sans-serif' }}>
         <Box
           sx={{
             width: 8,
@@ -90,52 +91,49 @@ export const StatisticsSection: React.FC<StatisticsSectionProps> = ({ tasks }) =
           }}
         />
         <Typography
-          variant="h2"
-          component="h2"
-          sx={{
-            color: 'text.primary',
-            fontWeight: 'medium',
-          }}
+          variant="h3"
+          component="h3"
+          sx={{ fontWeight: 700, fontSize: '1.15rem', color: 'var(--mui-text-primary)', textShadow: '0 2px 8px rgba(0,0,0,0.12)', letterSpacing: '0.5px', mr: 2 }}
         >
           Live Dashboard Statistics
         </Typography>
       </Box>
 
       {/* Statistics Grid */}
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Tasks"
-            value={totalTasks}
-            color={LANE_COLORS[1]}
-            testId="total-task-count"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title={LANE_NAMES[1]}
-            value={todoCount}
-            color={LANE_COLORS[1]}
-            testId="lane-stat-1"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title={LANE_NAMES[2]}
-            value={inProgressCount}
-            color={LANE_COLORS[2]}
-            testId="lane-stat-2"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title={LANE_NAMES[3]}
-            value={completedCount}
-            color={LANE_COLORS[3]}
-            testId="lane-stat-3"
-          />
-        </Grid>
-      </Grid>
+          <Box sx={{ display: 'flex', gap: 3 }}>
+            <Box sx={{ flex: 1 }}>
+              <StatCard
+                title="Total Tasks"
+                value={totalTasks}
+                color={LANE_COLORS[1]}
+                testId="total-task-count"
+              />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <StatCard
+                title={LANE_NAMES[1]}
+                value={todoCount}
+                color={LANE_COLORS[1]}
+                testId="lane-stat-1"
+              />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <StatCard
+                title={LANE_NAMES[2]}
+                value={inProgressCount}
+                color={LANE_COLORS[2]}
+                testId="lane-stat-2"
+              />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <StatCard
+                title={LANE_NAMES[3]}
+                value={completedCount}
+                color={LANE_COLORS[3]}
+                testId="lane-stat-3"
+              />
+            </Box>
+          </Box>
     </Paper>
   );
 };

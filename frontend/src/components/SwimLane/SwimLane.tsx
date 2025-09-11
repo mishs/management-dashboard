@@ -28,14 +28,15 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
         sx={{
           p: 2,
           mb: 2,
-          backgroundColor: 'background.paper',
+          backgroundColor: 'var(--mui-bg-paper)',
           border: '1px solid',
-          borderColor: 'grey.200',
+          borderColor: 'var(--gray-200)',
           borderRadius: 2,
+          fontFamily: 'Inter, Roboto, sans-serif',
         }}
       >
         {/* Lane Title and Count */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, fontFamily: 'Inter, Roboto, sans-serif', gap: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box
               sx={{
@@ -45,7 +46,7 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
                 backgroundColor: laneColor,
               }}
             />
-            <Typography variant="h2" component="h2">
+            <Typography variant="h2" component="h2" sx={{ fontSize: '1.24rem', fontWeight: 600, color: 'var(--gray-950)', letterSpacing: '0.5px', textShadow: '0 1px 2px rgba(0,0,0,0.08)', fontFamily: 'Inter, Roboto, sans-serif' }}>
               {laneName}
             </Typography>
           </Box>
@@ -53,11 +54,16 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
             label={stats.total}
             size="small"
             sx={{
-              backgroundColor: 'primary.main',
-              color: 'white',
-              fontWeight: 'medium',
-              minWidth: 32,
-              height: 24,
+              backgroundColor: 'var(--mui-primary)',
+              color: 'var(--mui-bg-paper)',
+              fontWeight: 700,
+              fontSize: '1.05rem',
+              minWidth: 40,
+              height: 28,
+              borderRadius: '9999px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              fontFamily: 'Inter, Roboto, sans-serif',
+              letterSpacing: '0.5px',
             }}
             data-testid={`lane-task-count-${laneId}`}
           />
@@ -65,7 +71,7 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
 
         {/* Priority Statistics */}
         <Grid container spacing={1}>
-          <Grid item xs={4}>
+          <Grid columns={3}>
             <Box
               sx={{
                 backgroundColor: 'error.main',
@@ -84,7 +90,7 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
               </Typography>
             </Box>
           </Grid>
-          <Grid item xs={4}>
+          <Grid columns={3}>
             <Box
               sx={{
                 backgroundColor: '#eab308',
@@ -103,7 +109,7 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
               </Typography>
             </Box>
           </Grid>
-          <Grid item xs={4}>
+          <Grid columns={3}>
             <Box
               sx={{
                 backgroundColor: 'success.main',
@@ -178,11 +184,9 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
         ) : (
           <SortableContext items={tasks.map(task => task.id.toString())} strategy={verticalListSortingStrategy}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {tasks
-                .sort((a, b) => a.priority - b.priority)
-                .map((task) => (
-                  <TaskCard key={task.id} task={task} />
-                ))}
+              {([...tasks].sort((a, b) => a.priority - b.priority)).map((task) => (
+                <TaskCard key={task.id} task={task} />
+              ))}
             </Box>
           </SortableContext>
         )}

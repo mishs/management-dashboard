@@ -8,7 +8,8 @@ export const SavingIndicator: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         mt: 1,
-        color: 'primary.main',
+        color: 'var(--mui-primary)',
+        fontFamily: 'Inter, Roboto, sans-serif',
       }}
       data-testid="saving-indicator"
     >
@@ -17,14 +18,17 @@ export const SavingIndicator: React.FC = () => {
         thickness={4}
         sx={{
           mr: 1,
-          color: 'primary.main',
+          color: 'var(--mui-primary)',
         }}
       />
       <Typography
         variant="body2"
         sx={{
-          fontSize: '0.875rem',
-          color: 'primary.main',
+          fontSize: '0.96rem',
+          color: 'var(--mui-primary)',
+          fontWeight: 600,
+          textShadow: '0 1px 2px rgba(0,0,0,0.08)',
+          fontFamily: 'Inter, Roboto, sans-serif',
         }}
       >
         Saving changes...
