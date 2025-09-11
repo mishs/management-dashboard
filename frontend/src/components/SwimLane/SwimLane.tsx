@@ -184,7 +184,10 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
         ) : (
           <SortableContext items={tasks.map(task => task.id.toString())} strategy={verticalListSortingStrategy}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {([...tasks].sort((a, b) => a.priority - b.priority)).map((task) => (
+              {tasks
+                .filter(task => task.swimLane === laneId)
+                .sort((a, b) => a.priority - b.priority)
+                .map((task) => (
                 <TaskCard key={task.id} task={task} />
               ))}
             </Box>

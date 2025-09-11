@@ -69,12 +69,9 @@ export const Dashboard: React.FC = () => {
 
     const sourceLaneId = task.swimLane;
     
-    // If dropping in the same lane at the same position, do nothing
-    if (sourceLaneId === targetLaneId) {
-      return;
-    }
-    
-    const newPriority = tasks.filter(t => t.swimLane === targetLaneId).length + 1;
+    // Calculate new priority based on target lane
+    const targetLaneTasks = tasks.filter(t => t.swimLane === targetLaneId && t.id !== taskId);
+    const newPriority = targetLaneTasks.length + 1;
 
     // Update local state optimistically
     dispatch(moveTask({
@@ -84,32 +81,35 @@ export const Dashboard: React.FC = () => {
       newPriority,
     }));
 
-    const affectedTasks = calculateAffectedTasks(
-      tasks,
-      taskId,
-      sourceLaneId,
-      targetLaneId,
-      newPriority
-    );
+    // Only update backend if moving between different lanes
+    if (sourceLaneId !== targetLaneId) {
+      const affectedTasks = calculateAffectedTasks(
+        tasks,
+        taskId,
+        sourceLaneId,
+        targetLaneId,
+        newPriority
+      );
 
-    if (affectedTasks.length === 0) return;
+      // Show saving indicator and persist to backend
+      dispatch(setSaving(true));
 
-    // Show saving indicator and persist to backend
-    dispatch(setSaving(true));
-
-    try {
-      await updateTasks(affectedTasks).unwrap();
-
-      if (sourceLaneId !== targetLaneId) {
+      try {
+        await updateTasks(affectedTasks).unwrap();
         toast.success(`Task moved to ${LANE_NAMES[targetLaneId as keyof typeof LANE_NAMES]}`);
-      } else {
-        toast.success('Task priority updated');
+      } catch (error) {
+        toast.error('Failed to update task. Please try again.');
+        console.error('Failed to update tasks:', error);
+        // Revert the optimistic update on error
+        dispatch(moveTask({
+          taskId,
+          sourceLane: targetLaneId,
+          targetLane: sourceLaneId,
+          newPriority: task.priority,
+        }));
+      } finally {
+        dispatch(setSaving(false));
       }
-    } catch (error) {
-      toast.error('Failed to update task. Please try again.');
-      console.error('Failed to update tasks:', error);
-    } finally {
-      dispatch(setSaving(false));
     }
   }, [tasks, dispatch, updateTasks]);
 

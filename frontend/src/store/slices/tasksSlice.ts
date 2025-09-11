@@ -34,31 +34,41 @@ const tasksSlice = createSlice({
     }>) => {
       const { taskId, sourceLane, targetLane, newPriority } = action.payload;
       
-      // Find the task in the flat array
-      const task = state.tasks.find(t => t.id === taskId);
-      if (!task) return;
+      // Find the task and update it
+      const taskIndex = state.tasks.findIndex(t => t.id === taskId);
+      if (taskIndex === -1) return;
       
-      // Update the task's lane and priority
-      task.swimLane = targetLane as 1 | 2 | 3;
-      task.priority = newPriority;
+      // Create a new task object with updated properties
+      state.tasks[taskIndex] = {
+        ...state.tasks[taskIndex],
+        swimLane: targetLane as 1 | 2 | 3,
+        priority: newPriority,
+      };
       
-      // Recompute priorities for source lane (shift tasks up)
+      // Only recompute priorities if moving between different lanes
       if (sourceLane !== targetLane) {
+        // Recompute priorities for source lane (shift tasks up)
         const sourceTasks = state.tasks
           .filter(t => t.swimLane === sourceLane && t.id !== taskId)
           .sort((a, b) => a.priority - b.priority);
         sourceTasks.forEach((t, index) => {
-          t.priority = index + 1;
+          const taskIdx = state.tasks.findIndex(task => task.id === t.id);
+          if (taskIdx !== -1) {
+            state.tasks[taskIdx] = { ...state.tasks[taskIdx], priority: index + 1 };
+          }
+        });
+        
+        // Recompute priorities for target lane
+        const targetTasks = state.tasks
+          .filter(t => t.swimLane === targetLane)
+          .sort((a, b) => a.priority - b.priority);
+        targetTasks.forEach((t, index) => {
+          const taskIdx = state.tasks.findIndex(task => task.id === t.id);
+          if (taskIdx !== -1) {
+            state.tasks[taskIdx] = { ...state.tasks[taskIdx], priority: index + 1 };
+          }
         });
       }
-      
-      // Recompute priorities for target lane
-      const targetTasks = state.tasks
-        .filter(t => t.swimLane === targetLane)
-        .sort((a, b) => a.priority - b.priority);
-      targetTasks.forEach((t, index) => {
-        t.priority = index + 1;
-      });
     },
     reorderLane: (state, action: PayloadAction<{ laneId: number }>) => {
       const { laneId } = action.payload;
