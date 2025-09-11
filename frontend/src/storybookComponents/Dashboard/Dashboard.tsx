@@ -8,10 +8,10 @@ import {
 } from '@dnd-kit/core';
 import { Box, Container, Typography, CircularProgress } from '@mui/material';
 import { toast } from 'sonner';
-import { SwimLane } from '../SwimLane/SwimLane';
-import { TaskCard } from '../TaskCard/TaskCard';
-import { StatisticsSection } from '../StatisticsSection/StatisticsSection';
-import { SavingIndicator } from '../SavingIndicator/SavingIndicator';
+import { SwimLane } from './SwimLane/SwimLane';
+import { TaskCard } from './TaskCard/TaskCard';
+import { StatisticsSection } from './StatisticsSection/StatisticsSection';
+import { SavingIndicator } from './SavingIndicator/SavingIndicator';
 import { useGetTasksQuery, useUpdateTasksMutation } from '../../store/api/tasksApi';
 import { useDnD } from '../../hooks/useDnD';
 import { useAppDispatch, useAppSelector } from '../../hooks';

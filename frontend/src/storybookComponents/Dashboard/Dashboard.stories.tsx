@@ -4,8 +4,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { Toaster } from 'sonner';
 import { Dashboard } from './Dashboard';
-import { store } from '../../store';
-import { theme } from '../../theme';
+import { store } from '../../../store';
+import { theme } from '../../../theme';
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Dashboard',
