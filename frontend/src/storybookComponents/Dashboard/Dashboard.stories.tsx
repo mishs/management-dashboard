@@ -28,7 +28,6 @@ const meta: Meta<typeof Dashboard> = {
   component: Dashboard,
   parameters: {
     layout: 'fullscreen',
-    // Prevent dynamic imports in stories
     docs: {
       source: {
         type: 'code',

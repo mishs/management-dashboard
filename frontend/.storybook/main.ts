@@ -3,6 +3,7 @@ import path from 'path';
 
 const config: StorybookConfig = {
   stories: [
+    '../src/**/*.mdx',
     '../src/**/*.stories.@(js|jsx|ts|tsx)',
     '../src/**/*.story.@(js|jsx|ts|tsx)'
   ],
@@ -15,17 +16,10 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
+  core: {
+    builder: '@storybook/builder-vite',
+  },
   viteFinal: async (config) => {
-    // Optimize chunk loading for better reliability
-    config.build = {
-      ...config.build,
-      rollupOptions: {
-        output: {
-          manualChunks: undefined,
-        },
-      },
-    };
-    
     // Add Vite aliases for Storybook
     config.resolve = config.resolve || {};
     config.resolve.alias = {
@@ -38,6 +32,16 @@ const config: StorybookConfig = {
       '@types': path.resolve(__dirname, '../src/types'),
       '@utils': path.resolve(__dirname, '../src/utils'),
       '@hooks': path.resolve(__dirname, '../src/hooks'),
+    };
+    
+    // Optimize build for better reliability
+    config.build = {
+      ...config.build,
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+        },
+      },
     };
     
     return config;
