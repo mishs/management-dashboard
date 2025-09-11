@@ -5,9 +5,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, CircularProgress, Box } from '@mui/material';
 import { Toaster } from 'sonner';
 import { Dashboard } from './Dashboard';
-import { store } from '../../../store';
-import { theme } from '../../../theme';
-import ChunkErrorBoundary from '../../../components/ErrorBoundary';
+import { store } from '@store';
+import { theme } from '@theme';
+import ChunkErrorBoundary from '@components/ErrorBoundary';
 
 // Loading component for Suspense
 const LoadingSpinner = () => (

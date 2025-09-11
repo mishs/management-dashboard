@@ -2,9 +2,9 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { Toaster } from 'sonner';
-import { Dashboard } from './storybookComponents/Dashboard/Dashboard';
-import { store } from './store';
-import { theme } from './theme';
+import { Dashboard } from '@storybookComponents/Dashboard/Dashboard';
+import { store } from '@store';
+import { theme } from '@theme';
 
 function App() {
   return (

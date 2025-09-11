@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Paper, Typography } from '@mui/material';
-import { TaskWithSwimLane, LANE_NAMES, LANE_COLORS } from '../../types';
+import { TaskWithSwimLane, LANE_NAMES, LANE_COLORS } from '@types';
 
 interface StatisticsSectionProps {
   tasks: TaskWithSwimLane[];

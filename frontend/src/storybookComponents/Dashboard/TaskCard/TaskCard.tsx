@@ -2,8 +2,8 @@ import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { Box, Card, CardContent, Typography, Chip, Stack } from '@mui/material';
 import { DragIndicator } from '@mui/icons-material';
-import { TaskWithSwimLane } from '../../../types';
-import { formatDate } from '../../../utils/taskHelpers';
+import { TaskWithSwimLane } from '@types';
+import { formatDate } from '@utils/taskHelpers';
 
 interface TaskCardProps {
   task: TaskWithSwimLane;

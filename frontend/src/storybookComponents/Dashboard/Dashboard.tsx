@@ -12,12 +12,12 @@ import { SwimLane } from './SwimLane/SwimLane';
 import { TaskCard } from './TaskCard/TaskCard';
 import { StatisticsSection } from './StatisticsSection/StatisticsSection';
 import { SavingIndicator } from './SavingIndicator/SavingIndicator';
-import { useGetTasksQuery, useUpdateTasksMutation } from '../../store/api/tasksApi';
-import { useDnD } from '../../hooks/useDnD';
-import { useAppDispatch, useAppSelector } from '../../hooks';
-import { setTasks, setActiveTask, setSaving, moveTask } from '../../store/slices/tasksSlice';
-import { calculateAffectedTasks } from '../../utils/taskHelpers';
-import { TaskWithSwimLane, LANE_NAMES } from '../../types';
+import { useGetTasksQuery, useUpdateTasksMutation } from '@store/api/tasksApi';
+import { useDnD } from '@hooks/useDnD';
+import { useAppDispatch, useAppSelector } from '@hooks';
+import { setTasks, setActiveTask, setSaving, moveTask } from '@store/slices/tasksSlice';
+import { calculateAffectedTasks } from '@utils/taskHelpers';
+import { TaskWithSwimLane, LANE_NAMES } from '@types';
 
 export const Dashboard: React.FC = () => {
   // State and hooks

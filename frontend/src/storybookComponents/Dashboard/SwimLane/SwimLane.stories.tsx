@@ -3,8 +3,8 @@ import { DndContext } from '@dnd-kit/core';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { SwimLane } from './SwimLane';
-import { theme } from '../../../theme';
-import { TaskWithSwimLane } from '../../../types';
+import { theme } from '@theme';
+import { TaskWithSwimLane } from '@types';
 
 const sampleTasks: TaskWithSwimLane[] = [
   {
