@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TaskWithSwimLane } from '../../types';
+import { tasksApi } from '../api/tasksApi';
 
 interface TasksState {
   tasks: TaskWithSwimLane[];
-  activeTask: TaskWithSwimLane | null;
+  activeTask: string | null;
   saving: boolean;
 }
 
@@ -20,7 +21,7 @@ const tasksSlice = createSlice({
     setTasks: (state, action: PayloadAction<TaskWithSwimLane[]>) => {
       state.tasks = action.payload;
     },
-    setActiveTask: (state, action: PayloadAction<TaskWithSwimLane | null>) => {
+    setActiveTask: (state, action: PayloadAction<string | null>) => {
       state.activeTask = action.payload;
     },
     setSaving: (state, action: PayloadAction<boolean>) => {
@@ -38,46 +39,51 @@ const tasksSlice = createSlice({
       const taskIndex = state.tasks.findIndex(t => t.id === taskId);
       if (taskIndex === -1) return;
       
-      // Create a new task object with updated properties
-      state.tasks[taskIndex] = {
-        ...state.tasks[taskIndex],
-        swimLane: targetLane as 1 | 2 | 3,
-        priority: newPriority,
-      };
+      // Update the task's swim lane
+      state.tasks[taskIndex].swimLane = targetLane as 1 | 2 | 3;
       
-      // Only recompute priorities if moving between different lanes
-      if (sourceLane !== targetLane) {
-        // Recompute priorities for source lane (shift tasks up)
-        const sourceTasks = state.tasks
-          .filter(t => t.swimLane === sourceLane && t.id !== taskId)
-          .sort((a, b) => a.priority - b.priority);
-        sourceTasks.forEach((t, index) => {
-          const taskIdx = state.tasks.findIndex(task => task.id === t.id);
-          if (taskIdx !== -1) {
-            state.tasks[taskIdx] = { ...state.tasks[taskIdx], priority: index + 1 };
+      // Recompute priorities for all tasks in both lanes
+      const sourceTasks = state.tasks.filter(t => t.swimLane === sourceLane);
+      const targetTasks = state.tasks.filter(t => t.swimLane === targetLane);
+      
+      // Update priorities for source lane
+      sourceTasks
+        .sort((a, b) => a.priority - b.priority)
+        .forEach((task, index) => {
+          const idx = state.tasks.findIndex(t => t.id === task.id);
+          if (idx !== -1) {
+            state.tasks[idx].priority = index + 1;
           }
         });
-        
-        // Recompute priorities for target lane
-        const targetTasks = state.tasks
-          .filter(t => t.swimLane === targetLane)
-          .sort((a, b) => a.priority - b.priority);
-        targetTasks.forEach((t, index) => {
-          const taskIdx = state.tasks.findIndex(task => task.id === t.id);
-          if (taskIdx !== -1) {
-            state.tasks[taskIdx] = { ...state.tasks[taskIdx], priority: index + 1 };
+      
+      // Update priorities for target lane
+      targetTasks
+        .sort((a, b) => a.priority - b.priority)
+        .forEach((task, index) => {
+          const idx = state.tasks.findIndex(t => t.id === task.id);
+          if (idx !== -1) {
+            state.tasks[idx].priority = index + 1;
           }
         });
-      }
     },
-    reorderLane: (state, action: PayloadAction<{ laneId: number }>) => {
-      const { laneId } = action.payload;
-        const laneTasks = state.tasks
-          .filter(t => t.swimLane === laneId)
-          .sort((a, b) => a.priority - b.priority);
-        laneTasks.forEach((t, index) => {
-          t.priority = index + 1;
-        });
+  },
+  extraReducers: (builder) => {
+    // Only update tasks from API if we don't have local tasks
+    builder.addMatcher(
+      tasksApi.endpoints.getTasks.matchFulfilled,
+      (state, action) => {
+        if (state.tasks.length === 0) {
+          const transformedTasks: TaskWithSwimLane[] = Object.entries(action.payload).flatMap(([laneId, laneTasks]) =>
+            laneTasks.map((task: any) => ({
+              ...task,
+              swimLane: parseInt(laneId) as 1 | 2 | 3,
+            }))
+          );
+          state.tasks = transformedTasks;
+        }
+      }
+    );
+  },
     },
   },
 });

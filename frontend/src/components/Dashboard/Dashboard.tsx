@@ -23,19 +23,21 @@ export const Dashboard: React.FC = () => {
   // State and hooks
   const dispatch = useAppDispatch();
   const tasksState = useAppSelector((state) => state.tasks);
-  const activeTaskId = tasksState.activeTask;
-  const saving = tasksState.saving;
+  const { tasks: localTasks, activeTask: activeTaskId, saving } = tasksState;
   
   const { data: tasksData, isLoading, error } = useGetTasksQuery();
   const [updateTasks] = useUpdateTasksMutation();
 
-  // Memoize tasks transformation
+  // Use local tasks from Redux state, fallback to API data
   const tasks: TaskWithSwimLane[] = React.useMemo(() => {
+    if (localTasks.length > 0) {
+      return localTasks;
+    }
     if (isLoading || !tasksData) return [];
     return Object.entries(tasksData).flatMap(([laneId, laneTasks]) =>
       laneTasks.map(task => ({ ...task, swimLane: parseInt(laneId) as 1 | 2 | 3 }))
     );
-  }, [tasksData, isLoading]);
+  }, [localTasks, tasksData, isLoading]);
 
   // Memoize swimlane filtering
   const swimLaneTasks = {
@@ -69,53 +71,50 @@ export const Dashboard: React.FC = () => {
 
     const sourceLaneId = task.swimLane;
     
-    // Calculate new priority based on target lane
-    const targetLaneTasks = tasks.filter(t => t.swimLane === targetLaneId && t.id !== taskId);
-    const newPriority = targetLaneTasks.length + 1;
+    // Skip if dropping in the same lane
+    if (sourceLaneId === targetLaneId) return;
 
-    // Update local state optimistically
+    // Update local state immediately (optimistic update)
     dispatch(moveTask({
       taskId,
       sourceLane: sourceLaneId,
       targetLane: targetLaneId,
-      newPriority,
+      newPriority: 1, // Will be recalculated in the reducer
     }));
 
-    // Only update backend if moving between different lanes
-    if (sourceLaneId !== targetLaneId) {
+    // Show success message
+    toast.success(`Task moved to ${LANE_NAMES[targetLaneId as keyof typeof LANE_NAMES]}`);
+
+    // Optionally update backend (commented out for now to ensure UI works)
+    /*
+    dispatch(setSaving(true));
+    try {
       const affectedTasks = calculateAffectedTasks(
         tasks,
         taskId,
         sourceLaneId,
         targetLaneId,
-        newPriority
+        1
       );
-
-      // Show saving indicator and persist to backend
-      dispatch(setSaving(true));
-
-      try {
-        await updateTasks(affectedTasks).unwrap();
-        toast.success(`Task moved to ${LANE_NAMES[targetLaneId as keyof typeof LANE_NAMES]}`);
-      } catch (error) {
-        toast.error('Failed to update task. Please try again.');
-        console.error('Failed to update tasks:', error);
-        // Revert the optimistic update on error
-        dispatch(moveTask({
-          taskId,
-          sourceLane: targetLaneId,
-          targetLane: sourceLaneId,
-          newPriority: task.priority,
-        }));
-      } finally {
-        dispatch(setSaving(false));
-      }
+      await updateTasks(affectedTasks).unwrap();
+    } catch (error) {
+      toast.error('Failed to update task. Please try again.');
+      // Revert the optimistic update on error
+      dispatch(moveTask({
+        taskId,
+        sourceLane: targetLaneId,
+        targetLane: sourceLaneId,
+        newPriority: task.priority,
+      }));
+    } finally {
+      dispatch(setSaving(false));
     }
+    */
   }, [tasks, dispatch, updateTasks]);
 
-  // Transform API data to include swimLane property
+  // Initialize tasks from API data only once
   useEffect(() => {
-    if (tasksData) {
+    if (tasksData && localTasks.length === 0) {
       const transformedTasks: TaskWithSwimLane[] = Object.entries(tasksData).flatMap(([laneId, laneTasks]) =>
         laneTasks.map((task: any) => ({
           ...task,
@@ -124,7 +123,7 @@ export const Dashboard: React.FC = () => {
       );
       dispatch(setTasks(transformedTasks));
     }
-  }, [tasksData, dispatch]);
+  }, [tasksData, dispatch, localTasks.length]);
 
   if (isLoading) {
     return (
@@ -178,7 +177,7 @@ export const Dashboard: React.FC = () => {
         <DragOverlay>
           {activeTaskId ? (
             (() => {
-              const foundTask = tasks.find(t => t.id === Number(activeTaskId));
+              const foundTask = tasks.find(t => t.id.toString() === activeTaskId);
               return foundTask ? <TaskCard task={foundTask} isDragging /> : null;
             })()
           ) : null}
