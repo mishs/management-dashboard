@@ -32,7 +32,7 @@ const sampleTasks: TaskWithSwimLane[] = [
 ];
 
 const meta: Meta<typeof SwimLane> = {
-  title: 'Components/SwimLane',
+  title: 'Dashboard/SwimLane',
   component: SwimLane,
   parameters: {
     layout: 'padded',
@@ -54,21 +54,24 @@ const meta: Meta<typeof SwimLane> = {
 export default meta;
 type Story = StoryObj<typeof SwimLane>;
 
-export const TodoLane: Story = {
+export const TodoLaneWithTasks: Story = {
+  name: 'To Do Lane (With Tasks)',
   args: {
     laneId: 1,
     tasks: sampleTasks,
   },
 };
 
-export const InProgressLane: Story = {
+export const InProgressLaneEmpty: Story = {
+  name: 'In Progress Lane (Empty)',
   args: {
     laneId: 2,
     tasks: [],
   },
 };
 
-export const CompletedLane: Story = {
+export const CompletedLaneWithOneTask: Story = {
+  name: 'Completed Lane (One Task)',
   args: {
     laneId: 3,
     tasks: [sampleTasks[0]],

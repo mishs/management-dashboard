@@ -8,7 +8,7 @@ import { store } from '../../../store';
 import { theme } from '../../../theme';
 
 const meta: Meta<typeof Dashboard> = {
-  title: 'Components/Dashboard',
+  title: 'Dashboard/Dashboard',
   component: Dashboard,
   parameters: {
     layout: 'fullscreen',
@@ -29,8 +29,10 @@ const meta: Meta<typeof Dashboard> = {
 export default meta;
 type Story = StoryObj<typeof Dashboard>;
 
-export const Default: Story = {
+export const DefaultDashboard: Story = {
+  name: 'Default Dashboard View',
 };
 
-export const Loading: Story = {
+export const LoadingDashboard: Story = {
+  name: 'Dashboard Loading State',
 };

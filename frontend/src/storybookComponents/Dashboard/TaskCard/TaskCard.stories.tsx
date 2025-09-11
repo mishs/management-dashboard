@@ -19,7 +19,7 @@ const sampleTask: TaskWithSwimLane = {
 };
 
 const meta: Meta<typeof TaskCard> = {
-  title: 'Components/TaskCard',
+  title: 'Dashboard/TaskCard',
   component: TaskCard,
   parameters: {
     layout: 'padded',
@@ -41,17 +41,20 @@ const meta: Meta<typeof TaskCard> = {
 export default meta;
 type Story = StoryObj<typeof TaskCard>;
 
-export const HighPriority: Story = {
+export const HighPriorityTask: Story = {
+  name: 'High Priority Task',
   args: {
     task: sampleTask,
     isDragging: false,
   },
 };
 
-export const MediumPriority: Story = {
+export const MediumPriorityTask: Story = {
+  name: 'Medium Priority Task',
   args: {
     task: {
       ...sampleTask,
+      id: 2,
       priorityLevel: 'Medium',
       taskName: 'Set up Redux store',
       description: 'Configure Redux Toolkit with RTK Query for state management',
@@ -60,10 +63,12 @@ export const MediumPriority: Story = {
   },
 };
 
-export const LowPriority: Story = {
+export const LowPriorityTask: Story = {
+  name: 'Low Priority Task',
   args: {
     task: {
       ...sampleTask,
+      id: 3,
       priorityLevel: 'Low',
       taskName: 'Write unit tests',
       description: 'Add comprehensive test coverage for components',
@@ -73,17 +78,22 @@ export const LowPriority: Story = {
   },
 };
 
-export const Dragging: Story = {
+export const DraggingTask: Story = {
+  name: 'Task Being Dragged',
   args: {
-    task: sampleTask,
+    task: {
+      ...sampleTask,
+      id: 4,
+    },
     isDragging: true,
   },
 };
 
-export const MinimalTask: Story = {
+export const MinimalTaskCard: Story = {
+  name: 'Minimal Task (No Extras)',
   args: {
     task: {
-      id: 2,
+      id: 5,
       taskName: 'Simple task without extras',
       priority: 1,
       swimLane: 1,
