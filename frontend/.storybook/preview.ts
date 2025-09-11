@@ -9,6 +9,12 @@ const preview: Preview = {
         date: /Date$/,
       },
     },
+    // Improve module loading reliability
+    docs: {
+      source: {
+        type: 'code',
+      },
+    },
   },
 };
 

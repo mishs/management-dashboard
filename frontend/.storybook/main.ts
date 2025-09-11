@@ -2,8 +2,8 @@ import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
   stories: [
-    '../src/storybookComponents/**/*.stories.@(js|jsx|ts|tsx|mdx)',
-    '../src/storybookComponents/**/*.story.@(js|jsx|ts|tsx)'
+    '../src/**/*.stories.@(js|jsx|ts|tsx)',
+    '../src/**/*.story.@(js|jsx|ts|tsx)'
   ],
   addons: [
     '@storybook/addon-links',
@@ -13,6 +13,18 @@ const config: StorybookConfig = {
   framework: {
     name: '@storybook/react-vite',
     options: {},
+  },
+  viteFinal: async (config) => {
+    // Optimize chunk loading for better reliability
+    config.build = {
+      ...config.build,
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+        },
+      },
+    };
+    return config;
   },
   typescript: {
     check: false,
