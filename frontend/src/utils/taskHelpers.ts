@@ -86,6 +86,7 @@ export const calculateAffectedTasks = (
     }
   }
   
+  console.log('MS test calculateAffectedTasks returns only the tasks whose position or lane changed.', affectedTasks);
   return affectedTasks;
 };
 

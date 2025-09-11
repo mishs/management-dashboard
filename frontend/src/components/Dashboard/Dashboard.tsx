@@ -109,31 +109,6 @@ export const Dashboard: React.FC = () => {
     // Show success message
     toast.success(`Task moved to ${LANE_NAMES[targetLaneId as keyof typeof LANE_NAMES]}`);
 
-    // Optionally update backend (commented out for now to ensure UI works)
-    /*
-    dispatch(setSaving(true));
-    try {
-      const affectedTasks = calculateAffectedTasks(
-        tasks,
-        taskId,
-        sourceLaneId,
-        targetLaneId,
-        1
-      );
-      await updateTasks(affectedTasks).unwrap();
-    } catch (error) {
-      toast.error('Failed to update task. Please try again.');
-      // Revert the optimistic update on error
-      dispatch(moveTask({
-        taskId,
-        sourceLane: targetLaneId,
-        targetLane: sourceLaneId,
-        newPriority: task.priority,
-      }));
-    } finally {
-      dispatch(setSaving(false));
-    }
-    */
   }, [tasks, dispatch, updateTasks]);
 
   // Initialize tasks from API data only once

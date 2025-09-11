@@ -115,7 +115,10 @@ export const handlers = [
         priority: number;
         swimLane: number;
       }>;
-      
+      // Requirement check: log only affected tasks sent to backend
+      updatedTasks.forEach((updatedTask) => {
+        console.log('updatedTasks - in handler [Requirement Check] Only affected tasks sent to backend:', updatedTask);
+      });
       // Update tasks based on the payload
       updatedTasks.forEach((updatedTask) => {
         // Find the task in all swim lanes and update it

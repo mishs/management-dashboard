@@ -130,7 +130,7 @@ export const tasksApi = createApi({
     updateTasks: builder.mutation<{ status: number }, Partial<TaskWithSwimLane>[]>({
       queryFn: async (tasks) => {
         // Simulate successful update
-        console.log('Updating tasks:', tasks);
+        console.log('Dashboard- Updating tasks:', tasks);
         return { data: { status: 200 } };
       },
       invalidatesTags: ['Tasks'],
