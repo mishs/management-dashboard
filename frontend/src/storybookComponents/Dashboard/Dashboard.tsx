@@ -10,7 +10,7 @@ import { Box, Container, Typography, CircularProgress } from '@mui/material';
 import { toast } from 'sonner';
 import { SwimLane } from './SwimLane/SwimLane';
 import { TaskCard } from './TaskCard/TaskCard';
-import { StatisticsSection } from './StatisticsSection/StatisticsSection';
+import { StatisticsSection } from '@storybookComponents/StatisticsSection/StatisticsSection';
 import { SavingIndicator } from './SavingIndicator/SavingIndicator';
 import { useGetTasksQuery, useUpdateTasksMutation } from '@store/api/tasksApi';
 import { useDnD } from '@hooks/useDnD';
