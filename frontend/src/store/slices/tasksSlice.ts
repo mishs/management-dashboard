@@ -84,8 +84,6 @@ const tasksSlice = createSlice({
       }
     );
   },
-    },
-  },
 });
 
 export const { setTasks, setActiveTask, setSaving, moveTask } = tasksSlice.actions;
