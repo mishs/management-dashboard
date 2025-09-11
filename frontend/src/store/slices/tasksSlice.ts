@@ -33,13 +33,33 @@ const tasksSlice = createSlice({
       newPriority: number;
     }>) => {
       const { taskId, sourceLane, targetLane, newPriority } = action.payload;
+      
       // Find the task in the flat array
       const task = state.tasks.find(t => t.id === taskId);
       if (!task) return;
+      
+      // Update the task's lane and priority
       task.swimLane = targetLane as 1 | 2 | 3;
       task.priority = newPriority;
-      // Recompute priorities for both lanes
-      [sourceLane, targetLane].forEach(laneId => {
+      
+      // Recompute priorities for source lane (shift tasks up)
+      if (sourceLane !== targetLane) {
+        const sourceTasks = state.tasks
+          .filter(t => t.swimLane === sourceLane && t.id !== taskId)
+          .sort((a, b) => a.priority - b.priority);
+        sourceTasks.forEach((t, index) => {
+          t.priority = index + 1;
+        });
+      }
+      
+      // Recompute priorities for target lane
+      const targetTasks = state.tasks
+        .filter(t => t.swimLane === targetLane)
+        .sort((a, b) => a.priority - b.priority);
+      targetTasks.forEach((t, index) => {
+        t.priority = index + 1;
+      });
+    },
         const laneTasks = state.tasks
           .filter(t => t.swimLane === laneId)
           .sort((a, b) => a.priority - b.priority);

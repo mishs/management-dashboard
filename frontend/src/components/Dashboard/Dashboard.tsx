@@ -57,6 +57,7 @@ export const Dashboard: React.FC = () => {
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
     dispatch(setActiveTask(null));
+    
     if (!over) return;
 
     const taskId = parseInt(active.id as string);
@@ -67,7 +68,22 @@ export const Dashboard: React.FC = () => {
     if (!task) return;
 
     const sourceLaneId = task.swimLane;
+    
+    // If dropping in the same lane at the same position, do nothing
+    if (sourceLaneId === targetLaneId) {
+      return;
+    }
+    
     const newPriority = tasks.filter(t => t.swimLane === targetLaneId).length + 1;
+
+    // Update local state optimistically
+    dispatch(moveTask({
+      taskId,
+      sourceLane: sourceLaneId,
+      targetLane: targetLaneId,
+      newPriority,
+    }));
+
     const affectedTasks = calculateAffectedTasks(
       tasks,
       taskId,
@@ -77,14 +93,6 @@ export const Dashboard: React.FC = () => {
     );
 
     if (affectedTasks.length === 0) return;
-
-    // Update local state optimistically
-    dispatch(moveTask({
-      taskId,
-      sourceLane: sourceLaneId,
-      targetLane: targetLaneId,
-      newPriority,
-    }));
 
     // Show saving indicator and persist to backend
     dispatch(setSaving(true));
