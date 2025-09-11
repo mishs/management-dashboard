@@ -112,13 +112,20 @@ export const tasksApi = createApi({
     },
   }),
   tagTypes: ['Tasks'],
+  // Disable automatic refetching to prevent overriding local state
+  refetchOnMountOrArgChange: false,
+  refetchOnFocus: false,
+  refetchOnReconnect: false,
   endpoints: (builder) => ({
     getTasks: builder.query<TasksResponse, void>({
       queryFn: async () => {
         // Return mock data directly to avoid API call failures
+        console.log('📡 API: Returning mock data');
         return { data: mockTasksData };
       },
       providesTags: ['Tasks'],
+      // Prevent automatic refetching
+      keepUnusedDataFor: 0,
     }),
     updateTasks: builder.mutation<{ status: number }, Partial<TaskWithSwimLane>[]>({
       queryFn: async (tasks) => {

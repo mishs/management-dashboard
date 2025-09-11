@@ -25,25 +25,35 @@ export const Dashboard: React.FC = () => {
   const tasksState = useAppSelector((state) => state.tasks);
   const { tasks: localTasks, activeTask: activeTaskId, saving } = tasksState;
   
-  const { data: tasksData, isLoading, error } = useGetTasksQuery();
+  const { data: tasksData, isLoading, error } = useGetTasksQuery(undefined, {
+    // Only fetch once and don't refetch
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+    skip: localTasks.length > 0, // Skip API call if we have local data
+  });
   const [updateTasks] = useUpdateTasksMutation();
 
-  // Use local tasks from Redux state, fallback to API data
-  const tasks: TaskWithSwimLane[] = React.useMemo(() => {
-    if (localTasks.length > 0) {
-      return localTasks;
-    }
-    if (isLoading || !tasksData) return [];
-    return Object.entries(tasksData).flatMap(([laneId, laneTasks]) =>
-      laneTasks.map(task => ({ ...task, swimLane: parseInt(laneId) as 1 | 2 | 3 }))
-    );
-  }, [localTasks, tasksData, isLoading]);
+  // Always use Redux state as source of truth
+  const tasks: TaskWithSwimLane[] = localTasks;
 
   // Memoize swimlane filtering
   const swimLaneTasks = {
-    1: React.useMemo(() => tasks.filter(t => t.swimLane === 1), [tasks]),
-    2: React.useMemo(() => tasks.filter(t => t.swimLane === 2), [tasks]),
-    3: React.useMemo(() => tasks.filter(t => t.swimLane === 3), [tasks]),
+    1: React.useMemo(() => {
+      const filtered = tasks.filter(t => t.swimLane === 1);
+      console.log('🏊 Lane 1 tasks:', filtered.length, filtered.map(t => t.id));
+      return filtered;
+    }, [tasks]),
+    2: React.useMemo(() => {
+      const filtered = tasks.filter(t => t.swimLane === 2);
+      console.log('🏊 Lane 2 tasks:', filtered.length, filtered.map(t => t.id));
+      return filtered;
+    }, [tasks]),
+    3: React.useMemo(() => {
+      const filtered = tasks.filter(t => t.swimLane === 3);
+      console.log('🏊 Lane 3 tasks:', filtered.length, filtered.map(t => t.id));
+      return filtered;
+    }, [tasks]),
   };
 
   // DnD hooks
@@ -58,23 +68,37 @@ export const Dashboard: React.FC = () => {
   // Handle drag end events
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
+    console.log('🎯 Drag end:', { activeId: active.id, overId: over?.id });
+    
     dispatch(setActiveTask(null));
     
-    if (!over) return;
+    if (!over) {
+      console.log('❌ No drop target');
+      return;
+    }
 
     const taskId = parseInt(active.id as string);
     const targetLaneId = parseInt(over.id as string);
+    console.log('📋 Task move:', { taskId, targetLaneId });
 
     // Find the task in the flat array
     const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
+    if (!task) {
+      console.log('❌ Task not found:', taskId);
+      return;
+    }
 
     const sourceLaneId = task.swimLane;
+    console.log('🔄 Move details:', { taskId, sourceLaneId, targetLaneId, taskName: task.taskName });
     
     // Skip if dropping in the same lane
-    if (sourceLaneId === targetLaneId) return;
+    if (sourceLaneId === targetLaneId) {
+      console.log('⏭️ Same lane drop, skipping');
+      return;
+    }
 
     // Update local state immediately (optimistic update)
+    console.log('🚀 Dispatching moveTask action');
     dispatch(moveTask({
       taskId,
       sourceLane: sourceLaneId,
@@ -114,6 +138,11 @@ export const Dashboard: React.FC = () => {
 
   // Initialize tasks from API data only once
   useEffect(() => {
+    console.log('🔄 useEffect - Initialize tasks:', {
+      hasTasksData: !!tasksData,
+      localTasksLength: localTasks.length,
+    });
+    
     if (tasksData && localTasks.length === 0) {
       const transformedTasks: TaskWithSwimLane[] = Object.entries(tasksData).flatMap(([laneId, laneTasks]) =>
         laneTasks.map((task: any) => ({
@@ -121,6 +150,7 @@ export const Dashboard: React.FC = () => {
           swimLane: parseInt(laneId) as 1 | 2 | 3,
         }))
       );
+      console.log('📥 Setting initial tasks:', transformedTasks.length);
       dispatch(setTasks(transformedTasks));
     }
   }, [tasksData, dispatch, localTasks.length]);

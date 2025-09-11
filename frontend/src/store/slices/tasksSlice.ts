@@ -19,9 +19,11 @@ const tasksSlice = createSlice({
   initialState,
   reducers: {
     setTasks: (state, action: PayloadAction<TaskWithSwimLane[]>) => {
+      console.log('🏪 Redux setTasks:', action.payload.length);
       state.tasks = action.payload;
     },
     setActiveTask: (state, action: PayloadAction<string | null>) => {
+      console.log('🎯 Redux setActiveTask:', action.payload);
       state.activeTask = action.payload;
     },
     setSaving: (state, action: PayloadAction<boolean>) => {
@@ -34,17 +36,33 @@ const tasksSlice = createSlice({
       newPriority: number;
     }>) => {
       const { taskId, sourceLane, targetLane, newPriority } = action.payload;
+      console.log('🔄 Redux moveTask:', { taskId, sourceLane, targetLane });
       
       // Find the task and update it
       const taskIndex = state.tasks.findIndex(t => t.id === taskId);
-      if (taskIndex === -1) return;
+      if (taskIndex === -1) {
+        console.log('❌ Redux: Task not found:', taskId);
+        return;
+      }
       
-      // Update the task's swim lane
-      state.tasks[taskIndex].swimLane = targetLane as 1 | 2 | 3;
+      console.log('📍 Found task at index:', taskIndex, 'current lane:', state.tasks[taskIndex].swimLane);
+      
+      // Create a new task object with updated swim lane (immutable update)
+      state.tasks[taskIndex] = {
+        ...state.tasks[taskIndex],
+        swimLane: targetLane as 1 | 2 | 3,
+      };
+      console.log('✅ Updated task swimLane to:', targetLane);
       
       // Recompute priorities for all tasks in both lanes
       const sourceTasks = state.tasks.filter(t => t.swimLane === sourceLane);
       const targetTasks = state.tasks.filter(t => t.swimLane === targetLane);
+      console.log('📊 Lane counts after move:', {
+        sourceLane,
+        sourceCount: sourceTasks.length,
+        targetLane,
+        targetCount: targetTasks.length,
+      });
       
       // Update priorities for source lane
       sourceTasks
@@ -52,7 +70,10 @@ const tasksSlice = createSlice({
         .forEach((task, index) => {
           const idx = state.tasks.findIndex(t => t.id === task.id);
           if (idx !== -1) {
-            state.tasks[idx].priority = index + 1;
+            state.tasks[idx] = {
+              ...state.tasks[idx],
+              priority: index + 1,
+            };
           }
         });
       
@@ -62,16 +83,21 @@ const tasksSlice = createSlice({
         .forEach((task, index) => {
           const idx = state.tasks.findIndex(t => t.id === task.id);
           if (idx !== -1) {
-            state.tasks[idx].priority = index + 1;
+            state.tasks[idx] = {
+              ...state.tasks[idx],
+              priority: index + 1,
+            };
           }
         });
+      console.log('✅ Redux moveTask completed');
     },
   },
   extraReducers: (builder) => {
-    // Only update tasks from API if we don't have local tasks
+    // Initialize tasks from API only once
     builder.addMatcher(
       tasksApi.endpoints.getTasks.matchFulfilled,
       (state, action) => {
+        console.log('📡 API response received, local tasks:', state.tasks.length);
         if (state.tasks.length === 0) {
           const transformedTasks: TaskWithSwimLane[] = Object.entries(action.payload).flatMap(([laneId, laneTasks]) =>
             laneTasks.map((task: any) => ({
@@ -79,7 +105,10 @@ const tasksSlice = createSlice({
               swimLane: parseInt(laneId) as 1 | 2 | 3,
             }))
           );
+          console.log('📥 Initializing tasks from API:', transformedTasks.length);
           state.tasks = transformedTasks;
+        } else {
+          console.log('⏭️ Skipping API data, using existing local tasks');
         }
       }
     );
