@@ -60,13 +60,14 @@ const tasksSlice = createSlice({
         t.priority = index + 1;
       });
     },
+    reorderLane: (state, action: PayloadAction<{ laneId: number }>) => {
+      const { laneId } = action.payload;
         const laneTasks = state.tasks
           .filter(t => t.swimLane === laneId)
           .sort((a, b) => a.priority - b.priority);
         laneTasks.forEach((t, index) => {
           t.priority = index + 1;
         });
-      });
     },
   },
 });
