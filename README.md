@@ -106,23 +106,32 @@ frontend/
 ```
 
 
-## ✅ What Has Been Done (in relation to requirements)
+## ✅ What Has Been Done (in relation to 'Evaluation Criteria')
+Following attended as shown under 'All Functional requirement and Non-Functional Requirements below:
+- **TypeScript** best practices (mainly on API Contracts, Redux, etc)
+- Working code demonstrating components (and project) structuring.
+- Clarifying your commit history
+- Completeness of features
+- Correctness: functionality act in sensible and thought-out ways.
+- Maintainability: written in a clean and maintainable way
+- Testing: system tested beyond basic functionality, with a focus on edge cases and inclusion of Storybook (visual testing etc.)
+- Built version in my **public** folder.
 
-- All functional requirements from the Combined Specification are implemented:
-  - Tasks prefilled from GET /api/tasks
-  - Three swimlanes: To Do, In Progress, Completed
-  - Drag-and-drop reorder and move between lanes
-  - Priority recalculation (ascending from 1) after drop
-  - Only affected tasks POSTed to backend
-  - Error notification on failed POST
-  - No "Add Task" feature (by design)
-- Non-functional requirements:
-  - Strict TypeScript, modular structure
-  - Playwright E2E tests for main flows
-  - Storybook for component documentation
-  - Responsive, accessible UI (pointer DnD)
-  - No changes to provided service worker
-  - Linting and formatting enforced
+  - All Functional requirements:
+    - Tasks prefilled from GET /api/tasks
+    - Three swimlanes: To Do, In Progress, Completed
+    - Drag-and-drop reorder and move between lanes
+    - Priority recalculation (ascending from 1) after drop
+    - Only affected tasks POSTed to backend
+    - Error notification on failed POST
+    - No "Add Task" feature (by design)
+  - Non-functional requirements:
+    - Strict TypeScript, modular structure
+    - Playwright E2E tests for main flows
+    - Storybook for component documentation
+    - Responsive, accessible UI (pointer DnD)
+    - No changes to provided service worker
+    - Linting and formatting enforced
 
 ## 🏆 Above & Beyond
 
