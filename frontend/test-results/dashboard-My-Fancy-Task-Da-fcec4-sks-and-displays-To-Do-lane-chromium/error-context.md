@@ -1,0 +1,181 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - heading "My Fancy Task Dashboard" [level=1] [ref=e5]
+      - paragraph [ref=e6]: Drag and drop tasks between swim lanes to update their status
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e10]:
+            - heading "To Do" [level=2] [ref=e13]
+            - generic [ref=e15]: "5"
+          - generic [ref=e16]:
+            - generic [ref=e19]: "High: 2"
+            - generic [ref=e22]: "Med: 2"
+            - generic [ref=e25]: "Low: 1"
+        - generic [ref=e27]:
+          - 'button "Design wireframes for dashboard High Create initial wireframes for the task management dashboard Alex Chen Due: Dec 15 design wireframes Priority: 1" [ref=e28]':
+            - generic [ref=e29]:
+              - generic [ref=e30]:
+                - heading "Design wireframes for dashboard" [level=3] [ref=e33]
+                - generic [ref=e35]: High
+              - generic [ref=e36]: Create initial wireframes for the task management dashboard
+              - generic [ref=e39]: Alex Chen
+              - generic [ref=e40]: "Due: Dec 15"
+              - generic [ref=e41]:
+                - generic [ref=e43]: design
+                - generic [ref=e45]: wireframes
+              - generic [ref=e46]:
+                - generic [ref=e47]: "Priority: 1"
+                - img [ref=e48]
+          - 'button "Implement drag and drop functionality High Add dnd-kit library and implement task reordering Sarah Kim Due: Dec 18 development frontend Priority: 2" [ref=e50]':
+            - generic [ref=e51]:
+              - generic [ref=e52]:
+                - heading "Implement drag and drop functionality" [level=3] [ref=e55]
+                - generic [ref=e57]: High
+              - generic [ref=e58]: Add dnd-kit library and implement task reordering
+              - generic [ref=e61]: Sarah Kim
+              - generic [ref=e62]: "Due: Dec 18"
+              - generic [ref=e63]:
+                - generic [ref=e65]: development
+                - generic [ref=e67]: frontend
+              - generic [ref=e68]:
+                - generic [ref=e69]: "Priority: 2"
+                - img [ref=e70]
+          - 'button "Set up Redux store Medium Configure Redux Toolkit with RTK Query for state management Mike Johnson Due: Dec 20 development state Priority: 3" [ref=e72]':
+            - generic [ref=e73]:
+              - generic [ref=e74]:
+                - heading "Set up Redux store" [level=3] [ref=e77]
+                - generic [ref=e79]: Medium
+              - generic [ref=e80]: Configure Redux Toolkit with RTK Query for state management
+              - generic [ref=e83]: Mike Johnson
+              - generic [ref=e84]: "Due: Dec 20"
+              - generic [ref=e85]:
+                - generic [ref=e87]: development
+                - generic [ref=e89]: state
+              - generic [ref=e90]:
+                - generic [ref=e91]: "Priority: 3"
+                - img [ref=e92]
+          - 'button "Create responsive layout Medium Ensure dashboard works on mobile and tablet devices Emma Davis Due: Dec 22 design responsive Priority: 4" [ref=e94]':
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - heading "Create responsive layout" [level=3] [ref=e99]
+                - generic [ref=e101]: Medium
+              - generic [ref=e102]: Ensure dashboard works on mobile and tablet devices
+              - generic [ref=e105]: Emma Davis
+              - generic [ref=e106]: "Due: Dec 22"
+              - generic [ref=e107]:
+                - generic [ref=e109]: design
+                - generic [ref=e111]: responsive
+              - generic [ref=e112]:
+                - generic [ref=e113]: "Priority: 4"
+                - img [ref=e114]
+          - 'button "Write unit tests Low Add comprehensive test coverage for components Tom Wilson Due: Dec 25 testing quality Priority: 5" [ref=e116]':
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - heading "Write unit tests" [level=3] [ref=e121]
+                - generic [ref=e123]: Low
+              - generic [ref=e124]: Add comprehensive test coverage for components
+              - generic [ref=e127]: Tom Wilson
+              - generic [ref=e128]: "Due: Dec 25"
+              - generic [ref=e129]:
+                - generic [ref=e131]: testing
+                - generic [ref=e133]: quality
+              - generic [ref=e134]:
+                - generic [ref=e135]: "Priority: 5"
+                - img [ref=e136]
+      - generic [ref=e138]:
+        - generic [ref=e139]:
+          - generic [ref=e140]:
+            - heading "In Progress" [level=2] [ref=e143]
+            - generic [ref=e145]: "2"
+          - generic [ref=e146]:
+            - generic [ref=e149]: "High: 1"
+            - generic [ref=e152]: "Med: 1"
+            - generic [ref=e155]: "Low: 0"
+        - generic [ref=e157]:
+          - 'button "API integration testing High Test mock service worker integration Lisa Brown Due: Dec 16 testing api Priority: 1" [ref=e158]':
+            - generic [ref=e159]:
+              - generic [ref=e160]:
+                - heading "API integration testing" [level=3] [ref=e163]
+                - generic [ref=e165]: High
+              - generic [ref=e166]: Test mock service worker integration
+              - generic [ref=e169]: Lisa Brown
+              - generic [ref=e170]: "Due: Dec 16"
+              - generic [ref=e171]:
+                - generic [ref=e173]: testing
+                - generic [ref=e175]: api
+              - generic [ref=e176]:
+                - generic [ref=e177]: "Priority: 1"
+                - img [ref=e178]
+          - 'button "Performance optimization Medium Optimize rendering and reduce bundle size David Lee Due: Dec 19 performance optimization Priority: 2" [ref=e180]':
+            - generic [ref=e181]:
+              - generic [ref=e182]:
+                - heading "Performance optimization" [level=3] [ref=e185]
+                - generic [ref=e187]: Medium
+              - generic [ref=e188]: Optimize rendering and reduce bundle size
+              - generic [ref=e191]: David Lee
+              - generic [ref=e192]: "Due: Dec 19"
+              - generic [ref=e193]:
+                - generic [ref=e195]: performance
+                - generic [ref=e197]: optimization
+              - generic [ref=e198]:
+                - generic [ref=e199]: "Priority: 2"
+                - img [ref=e200]
+      - generic [ref=e202]:
+        - generic [ref=e203]:
+          - generic [ref=e204]:
+            - heading "Completed" [level=2] [ref=e207]
+            - generic [ref=e209]: "2"
+          - generic [ref=e210]:
+            - generic [ref=e213]: "High: 0"
+            - generic [ref=e216]: "Med: 1"
+            - generic [ref=e219]: "Low: 1"
+        - generic [ref=e221]:
+          - 'button "Documentation review Low Review and update project documentation Anna Taylor Due: Dec 14 documentation Priority: 1" [ref=e222]':
+            - generic [ref=e223]:
+              - generic [ref=e224]:
+                - heading "Documentation review" [level=3] [ref=e227]
+                - generic [ref=e229]: Low
+              - generic [ref=e230]: Review and update project documentation
+              - generic [ref=e233]: Anna Taylor
+              - generic [ref=e234]: "Due: Dec 14"
+              - generic [ref=e237]: documentation
+              - generic [ref=e238]:
+                - generic [ref=e239]: "Priority: 1"
+                - img [ref=e240]
+          - 'button "Code review process Medium Establish code review guidelines and process Chris Anderson Due: Dec 17 process quality Priority: 2" [ref=e242]':
+            - generic [ref=e243]:
+              - generic [ref=e244]:
+                - heading "Code review process" [level=3] [ref=e247]
+                - generic [ref=e249]: Medium
+              - generic [ref=e250]: Establish code review guidelines and process
+              - generic [ref=e253]: Chris Anderson
+              - generic [ref=e254]: "Due: Dec 17"
+              - generic [ref=e255]:
+                - generic [ref=e257]: process
+                - generic [ref=e259]: quality
+              - generic [ref=e260]:
+                - generic [ref=e261]: "Priority: 2"
+                - img [ref=e262]
+    - status [ref=e264]
+    - generic [ref=e265]:
+      - heading "Live Dashboard Statistics" [level=3] [ref=e268]
+      - generic [ref=e269]:
+        - generic [ref=e271]:
+          - generic [ref=e272]: "9"
+          - paragraph [ref=e273]: Total Tasks
+        - generic [ref=e275]:
+          - generic [ref=e276]: "5"
+          - paragraph [ref=e277]: To Do
+        - generic [ref=e279]:
+          - generic [ref=e280]: "2"
+          - paragraph [ref=e281]: In Progress
+        - generic [ref=e283]:
+          - generic [ref=e284]: "2"
+          - paragraph [ref=e285]: Completed
+  - region "Notifications alt+T"
+```
