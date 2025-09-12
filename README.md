@@ -1,23 +1,15 @@
-## ⚡️ Important Uncovered Edge Cases
 
-- Dragging a task to a lane with no tasks (empty lane) and ensuring priorities start at 1
-- Rapid consecutive drag-and-drop actions (race conditions, UI sync)
-- Handling duplicate task IDs or corrupted data from backend
-- POST failure with partial update (should not corrupt local state)
-- Browser refresh during drag operation (state persistence)
-- Moving a task to the same position (should not trigger unnecessary updates)
-- Handling very large numbers of tasks (performance, virtualization)
-- Accessibility for users with assistive technologies (beyond pointer DnD)
-- Network latency or offline scenarios (sync, error handling)
-- Edge cases in priority calculation (e.g., gaps, non-sequential priorities)
-
-
-# My Fancy Task Dashboard
+# My Fancy Dashboard
 
 A modern task management dashboard built with React, TypeScript, Material-UI, Redux Toolkit, dnd-kit, and Playwright E2E tests. Implements all requirements from the Combined Specification (see below).
 
+ ## 📹 Demo & Live Link
 
-## 🚀 Features
+- [Demo Video](#) <!-- Add your video link here -->
+- [Live Project](#) <!-- Add your deployed link here -->
+
+
+## 🚀 Features (summarised)
 
 - **Drag & Drop**: Intuitive task management with dnd-kit
 - **Three Swim Lanes**: To Do, In Progress, Completed
@@ -66,6 +58,11 @@ npm run test:ui
 Start Storybook:
 ```bash
 npm run storybook
+```
+
+Playwright test:
+```bash
+npx playwright test
 ```
 
 
@@ -127,7 +124,20 @@ frontend/
   - No changes to provided service worker
   - Linting and formatting enforced
 
-## 🎯 Key Features
+## 🏆 Above & Beyond
+
+- Storybook for all major components
+    Storybook provides:
+    - Interactive component playground
+    - Props documentation
+    - Accessibility testing
+    - Visual regression testing setup
+- Proper design system and overal documentation of the project.
+- Error handling and notification system
+- Clean commit history and code organization
+- Accessible UI and UX
+
+  ## 🎯 Key Features (Detailed)
 
 ### Drag & Drop Functionality
 - Move tasks within the same swim lane to reorder
@@ -152,26 +162,31 @@ frontend/
 - Vitest/React Testing Library for unit/component tests (optional, for maintainability)
 - MSW for API mocking
 
+
+## ⚡️ Important Uncovered Edge Cases
+
+- Dragging a task to a lane with no tasks (empty lane) and ensuring priorities start at 1
+- Rapid consecutive drag-and-drop actions (race conditions, UI sync)
+- Handling duplicate task IDs or corrupted data from backend
+- POST failure with partial update (should not corrupt local state)
+- Browser refresh during drag operation (state persistence)
+- Moving a task to the same position (should not trigger unnecessary updates)
+- Handling very large numbers of tasks (performance, virtualization)
+- Accessibility for users with assistive technologies (beyond pointer DnD)
+- Network latency or offline scenarios (sync, error handling)
+- Edge cases in priority calculation (e.g., gaps, non-sequential priorities)
+
+## ⚠️ Missing/WIP Implementation
+
+- No real backend (data is hard-coded)
+- No CI/CD pipeline or automated deployment
+- No user authentication or advanced features
+- No keyboard/ARIA DnD (pointer DnD only)
+- Some advanced tests and monitoring not implemented
+
 ## 🔧 API Integration
 
-The application uses a mock backend powered by MSW that provides:
-
-- `GET /api/tasks` - Fetch all tasks organized by swim lanes
-- `POST /api/tasks` - Update task priorities and swim lane assignments
-
-### Task Data Structure
-
-```typescript
-interface Task {
-  id: number;
-  taskName: string;
-  priority: number;
-}
-
-interface TaskWithSwimLane extends Task {
-  swimLane: number;
-}
-```
+The application uses a mock backend powered by MSW.
 
 ## 🎨 Design System
 
@@ -208,14 +223,6 @@ View component documentation:
 npm run storybook
 ```
 
-Storybook provides:
-- Interactive component playground
-- Props documentation
-- Usage examples
-- Accessibility testing
-- Visual regression testing setup
-
-
 ## 🚀 Future Enhancements
 
 - [ ] Move task data to a real backend/database (currently hard-coded for demo)
@@ -232,7 +239,7 @@ Storybook provides:
 - [ ] Internationalization (i18n)
 - [ ] End-to-end monitoring and error tracking
 
-## 🏢 SDLC & Enterprise Quality Notes
+## 🏢 SDLC (WIP)
 
 - CI/CD pipeline setup (GitHub Actions) recommended for production
 - Automated test runs and code coverage reporting
@@ -242,37 +249,6 @@ Storybook provides:
 - Scalability: Consider state normalization, backend pagination
 - Maintainability: Modular code, clear separation of concerns
 - Monitoring: Integrate error tracking (Sentry, etc.)
-
-## 📹 Demo & Live Link
-
-- [Demo Video](#) <!-- Add your video link here -->
-- [Live Project](#) <!-- Add your deployed link here -->
-
-## 🏆 Above & Beyond
-
-- Strict TypeScript everywhere
-- Modular Redux Toolkit with RTK Query
-- Playwright E2E tests (industry standard)
-- Storybook for all major components
-- Responsive, accessible UI
-- Error handling and notification system
-- Clean commit history and code organization
-
-## ⚠️ Missing/WIP Implementation
-
-- No real backend (data is hard-coded)
-- No CI/CD pipeline or automated deployment
-- No user authentication or advanced features
-- No keyboard/ARIA DnD (pointer DnD only)
-- Some advanced tests and monitoring not implemented
-
-## 🧑‍💻 AI-generated Code Indicators
-
-- No explicit "Generated by Copilot" or similar comments found in the codebase.
-- If you see comments like "Requirement check", "MS test", or highly verbose logging, these may indicate AI-assisted code or code written with the help of Copilot or similar tools.
-- Modular, well-structured code and verbose comments may also suggest AI involvement, but no direct evidence is present.
-
-## 📄 License
 
 ## 🤝 Contributing
 
