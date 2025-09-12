@@ -114,7 +114,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
           )}
         </Box>
 
-        {/* Description */}
         {task.description && (
           <Typography
             variant="caption"
@@ -134,7 +133,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
           </Typography>
         )}
 
-        {/* Assignee */}
         {task.assignee && (
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <Box

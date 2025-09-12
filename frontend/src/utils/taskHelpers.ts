@@ -8,21 +8,15 @@ export const calculateAffectedTasks = (
   newPosition: number
 ): Partial<TaskWithSwimLane>[] => {
   const affectedTasks: Partial<TaskWithSwimLane>[] = [];
-  // Find the moved task
   const movedTask = tasks.find(task => task.id === movedTaskId);
   if (!movedTask) return affectedTasks;
-  
-  // If moving to a different lane
   if (sourceLane !== targetLane) {
-    // Add the moved task with new lane and priority
     affectedTasks.push({
       id: movedTask.id,
       taskName: movedTask.taskName,
       priority: newPosition,
       swimLane: targetLane as 1 | 2 | 3,
     });
-    
-    // Update priorities in source lane (tasks after the moved task)
     tasks
       .filter(task => task.swimLane === sourceLane && task.id !== movedTaskId && task.priority > movedTask.priority)
       .forEach(task => {
@@ -33,8 +27,6 @@ export const calculateAffectedTasks = (
           swimLane: sourceLane as 1 | 2 | 3,
         });
       });
-    
-    // Update priorities in target lane (tasks at and after the new position)
     tasks
       .filter(task => task.swimLane === targetLane && task.priority >= newPosition)
       .forEach(task => {
@@ -46,21 +38,15 @@ export const calculateAffectedTasks = (
         });
       });
   } else {
-    // Moving within the same lane
     const oldPosition = movedTask.priority;
-    
     if (oldPosition === newPosition) return affectedTasks;
-    
-    // Add the moved task with new priority
     affectedTasks.push({
       id: movedTask.id,
       taskName: movedTask.taskName,
       priority: newPosition,
       swimLane: sourceLane as 1 | 2 | 3,
     });
-    
     if (oldPosition < newPosition) {
-      // Moving down: shift tasks up
       tasks
         .filter(task => task.swimLane === sourceLane && task.id !== movedTaskId && task.priority > oldPosition && task.priority <= newPosition)
         .forEach(task => {
@@ -72,7 +58,6 @@ export const calculateAffectedTasks = (
           });
         });
     } else {
-      // Moving up: shift tasks down
       tasks
         .filter(task => task.swimLane === sourceLane && task.id !== movedTaskId && task.priority >= newPosition && task.priority < oldPosition)
         .forEach(task => {
@@ -85,14 +70,12 @@ export const calculateAffectedTasks = (
         });
     }
   }
-  
   console.log('MS test calculateAffectedTasks returns only the tasks whose position or lane changed.', affectedTasks);
   return affectedTasks;
 };
 
 export const getLaneStats = (tasks: TaskWithSwimLane[]) => {
   const stats = { high: 0, medium: 0, low: 0, total: tasks.length };
-  
   tasks.forEach(task => {
     switch (task.priorityLevel) {
       case 'High':
@@ -106,7 +89,6 @@ export const getLaneStats = (tasks: TaskWithSwimLane[]) => {
         break;
     }
   });
-  
   return stats;
 };
 

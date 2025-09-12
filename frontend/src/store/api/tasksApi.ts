@@ -1,7 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { TasksResponse, TaskWithSwimLane } from '../../types';
-
-// Mock data for development
 const mockTasksData: TasksResponse = {
   1: [
     {
@@ -105,31 +103,26 @@ export const tasksApi = createApi({
   reducerPath: 'tasksApi',
   baseQuery: fetchBaseQuery({
     baseUrl: '/api',
-    // Add error handling for failed requests
     prepareHeaders: (headers) => {
       headers.set('Content-Type', 'application/json');
       return headers;
     },
   }),
   tagTypes: ['Tasks'],
-  // Disable automatic refetching to prevent overriding local state
   refetchOnMountOrArgChange: false,
   refetchOnFocus: false,
   refetchOnReconnect: false,
   endpoints: (builder) => ({
     getTasks: builder.query<TasksResponse, void>({
       queryFn: async () => {
-        // Return mock data directly to avoid API call failures
         console.log('📡 API: Returning mock data');
         return { data: mockTasksData };
       },
       providesTags: ['Tasks'],
-      // Prevent automatic refetching
       keepUnusedDataFor: 0,
     }),
     updateTasks: builder.mutation<{ status: number }, Partial<TaskWithSwimLane>[]>({
       queryFn: async (tasks) => {
-        // Simulate successful update
         console.log('Dashboard- Updating tasks:', tasks);
         return { data: { status: 200 } };
       },

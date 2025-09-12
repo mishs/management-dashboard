@@ -20,24 +20,17 @@ import { calculateAffectedTasks } from '@utils/taskHelpers';
 import { TaskWithSwimLane, LANE_NAMES } from '@types';
 
 export const Dashboard: React.FC = () => {
-  // State and hooks
   const dispatch = useAppDispatch();
   const tasksState = useAppSelector((state) => state.tasks);
   const { tasks: localTasks, activeTask: activeTaskId, saving } = tasksState;
-  
   const { data: tasksData, isLoading, error } = useGetTasksQuery(undefined, {
-    // Only fetch once and don't refetch
     refetchOnMountOrArgChange: false,
     refetchOnFocus: false,
     refetchOnReconnect: false,
-    skip: localTasks.length > 0, // Skip API call if we have local data
+    skip: localTasks.length > 0,
   });
   const [updateTasks] = useUpdateTasksMutation();
-
-  // Always use Redux state as source of truth
   const tasks: TaskWithSwimLane[] = localTasks;
-
-  // Memoize swimlane filtering
   const swimLaneTasks = {
     1: React.useMemo(() => {
       const filtered = tasks.filter(t => t.swimLane === 1);
@@ -55,69 +48,47 @@ export const Dashboard: React.FC = () => {
       return filtered;
     }, [tasks]),
   };
-
-  // DnD hooks
   const { sensors, draggedId } = useDnD();
-
-  // Handle drag start events
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
     dispatch(setActiveTask(active.id));
   }, [dispatch]);
-
-  // Handle drag end events
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
     console.log('🎯 Drag end:', { activeId: active.id, overId: over?.id });
-    
     dispatch(setActiveTask(null));
-    
     if (!over) {
       console.log('❌ No drop target');
       return;
     }
-
     const taskId = parseInt(active.id as string);
     const targetLaneId = parseInt(over.id as string);
     console.log('📋 Task move:', { taskId, targetLaneId });
-
-    // Find the task in the flat array
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
       console.log('❌ Task not found:', taskId);
       return;
     }
-
     const sourceLaneId = task.swimLane;
     console.log('🔄 Move details:', { taskId, sourceLaneId, targetLaneId, taskName: task.taskName });
-    
-    // Skip if dropping in the same lane
     if (sourceLaneId === targetLaneId) {
       console.log('⏭️ Same lane drop, skipping');
       return;
     }
-
-    // Update local state immediately (optimistic update)
     console.log('🚀 Dispatching moveTask action');
     dispatch(moveTask({
       taskId,
       sourceLane: sourceLaneId,
       targetLane: targetLaneId,
-      newPriority: 1, // Will be recalculated in the reducer
+      newPriority: 1,
     }));
-
-    // Show success message
     toast.success(`Task moved to ${LANE_NAMES[targetLaneId as keyof typeof LANE_NAMES]}`);
-
   }, [tasks, dispatch, updateTasks]);
-
-  // Initialize tasks from API data only once
   useEffect(() => {
     console.log('🔄 useEffect - Initialize tasks:', {
       hasTasksData: !!tasksData,
       localTasksLength: localTasks.length,
     });
-    
     if (tasksData && localTasks.length === 0) {
       const transformedTasks: TaskWithSwimLane[] = Object.entries(tasksData).flatMap(([laneId, laneTasks]) =>
         laneTasks.map((task: any) => ({
@@ -129,7 +100,6 @@ export const Dashboard: React.FC = () => {
       dispatch(setTasks(transformedTasks));
     }
   }, [tasksData, dispatch, localTasks.length]);
-
   if (isLoading) {
     return (
       <Container maxWidth="xl" sx={{ py: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
@@ -137,7 +107,6 @@ export const Dashboard: React.FC = () => {
       </Container>
     );
   }
-
   if (error) {
     return (
       <Container maxWidth="xl" sx={{ py: 3 }}>
@@ -147,7 +116,6 @@ export const Dashboard: React.FC = () => {
       </Container>
     );
   }
-
   return (
   <Container maxWidth="xl" sx={{ py: 4, minHeight: '100vh', backgroundColor: 'var(--mui-bg-default)', fontFamily: 'Inter, Roboto, sans-serif', px: { xs: 2, md: 6 }, gap: 4 }} data-testid="dashboard">
       <Box sx={{ mb: 4 }}>
@@ -159,7 +127,6 @@ export const Dashboard: React.FC = () => {
         </Typography>
         {saving && <SavingIndicator />}
       </Box>
-
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -178,7 +145,6 @@ export const Dashboard: React.FC = () => {
           <SwimLane laneId={2} tasks={swimLaneTasks[2]} />
           <SwimLane laneId={3} tasks={swimLaneTasks[3]} />
         </Box>
-
         <DragOverlay>
           {activeTaskId ? (
             (() => {
@@ -188,7 +154,6 @@ export const Dashboard: React.FC = () => {
           ) : null}
         </DragOverlay>
       </DndContext>
-
   <StatisticsSection tasks={tasks} />
     </Container>
   );

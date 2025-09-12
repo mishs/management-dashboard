@@ -1,6 +1,4 @@
 import { http, HttpResponse } from 'msw';
-
-// Mock task data
 const mockTasks = {
   1: [
     {
@@ -115,23 +113,18 @@ export const handlers = [
         priority: number;
         swimLane: number;
       }>;
-      // Requirement check: log only affected tasks sent to backend
       updatedTasks.forEach((updatedTask) => {
         console.log('updatedTasks - in handler [Requirement Check] Only affected tasks sent to backend:', updatedTask);
       });
-      // Update tasks based on the payload
       updatedTasks.forEach((updatedTask) => {
-        // Find the task in all swim lanes and update it
         Object.keys(tasks).forEach((laneKey) => {
           const lane = laneKey;
           const laneTasks = (tasks as any)[lane];
           const taskIndex = laneTasks.findIndex((task: any) => task.id === updatedTask.id);
           if (taskIndex !== -1) {
-            // Remove from current lane if moving to different lane
             if (parseInt(lane) !== updatedTask.swimLane) {
               laneTasks.splice(taskIndex, 1);
             } else {
-              // Update in same lane
               laneTasks[taskIndex] = {
                 ...laneTasks[taskIndex],
                 ...updatedTask
@@ -139,7 +132,6 @@ export const handlers = [
             }
           }
         });
-        // Add to new lane if moving
         const targetLane = String(updatedTask.swimLane);
         const targetLaneTasks = (tasks as any)[targetLane];
         if (!targetLaneTasks.find((task: any) => task.id === updatedTask.id)) {
@@ -153,12 +145,10 @@ export const handlers = [
         }
       });
       
-      // Sort tasks by priority in each lane
       Object.keys(tasks).forEach((laneKey) => {
         const laneTasks = (tasks as any)[laneKey];
         laneTasks.sort((a: any, b: any) => a.priority - b.priority);
       });
-      // Return updated tasks so frontend can sync
       return HttpResponse.json(tasks);
     } catch (error) {
       return new HttpResponse(null, {

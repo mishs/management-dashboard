@@ -23,8 +23,6 @@ describe('taskHelpers', () => {
       );
 
       expect(result).toBeDefined();
-      // You may want to adjust this assertion based on your implementation
-      // expect(result).toHaveLength(4);
       const sourceTasks = result.filter(task => task.swimLane === SwimLane.TODO);
       expect(sourceTasks.length).toBeGreaterThanOrEqual(0);
     });

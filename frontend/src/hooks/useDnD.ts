@@ -18,7 +18,6 @@ export const useDnD = () => {
 
   const handleDragEnd = useCallback((event: any) => {
     setDraggedId(null);
-    // Additional drag end logic can be handled in Dashboard
   }, []);
 
   return {

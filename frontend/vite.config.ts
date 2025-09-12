@@ -5,7 +5,6 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Optimize chunk loading for better reliability
     rollupOptions: {
       output: {
         manualChunks: undefined,
