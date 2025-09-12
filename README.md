@@ -76,7 +76,22 @@ frontend/
 ├── src/
 │   ├── components/          # Shared React components
 │   ├── storybookComponents/ # Storybook-specific components
-│   │   └── Dashboard/       # Main dashboard, swimlanes, cards
+│   │   └── Dashboard/
+│   │       ├── Dashboard.stories.tsx
+│   │       ├── Dashboard.tsx
+│   │       ├── index.ts
+│   │       ├── SavingIndicator/
+│   │       │   ├── index.ts
+│   │       │   └── SavingIndicator.tsx
+│   │       ├── StatisticsSection/
+│   │       │   ├── index.ts
+│   │       │   └── StatisticsSection.tsx
+│   │       ├── SwimLane/
+│   │       │   ├── SwimLane.stories.tsx
+│   │       │   ├── SwimLane.tsx
+│   │       ├── TaskCard/
+│   │       │   ├── TaskCard.stories.tsx
+│   │       │   ├── TaskCard.tsx
 │   ├── store/
 │   │   ├── api/             # RTK Query API definitions
 │   │   └── slices/          # Redux slices
