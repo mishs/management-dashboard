@@ -175,5 +175,3 @@ Storybook provides:
 5. Run linting and formatting checks
 
 ## 📄 License
-
-This project is part of a technical assessment and follows the requirements specified in the original README.
