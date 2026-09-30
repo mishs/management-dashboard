@@ -1,5 +1,5 @@
 
-# My Fancy Dashboard
+# Fancy Dashboard
 
 A modern task management dashboard built with React, TypeScript, Material-UI, Redux Toolkit, dnd-kit, and Playwright E2E tests. Implements all requirements from the Combined Specification (see below).
 
