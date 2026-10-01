@@ -106,7 +106,7 @@ frontend/
 ```
 
 
-## ✅ What Has Been Done (in relation to 'Evaluation Criteria')
+## Implementation Overview
 Following attended as shown under 'All Functional requirement and Non-Functional Requirements below:
 - **TypeScript** best practices (mainly on API Contracts, Redux, etc)
 - Working code demonstrating components (and project) structuring.
