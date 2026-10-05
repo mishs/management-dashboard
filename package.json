@@ -17,6 +17,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test -c frontend/playwright.config.ts",
     "storybook": "cd frontend && storybook dev -p 6006",
     "build-storybook": "cd frontend && storybook build"
   },
@@ -38,6 +39,7 @@
     "sonner": "^1.7.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@storybook/addon-essentials": "^7.6.17",
     "@storybook/addon-interactions": "^7.6.17",
     "@storybook/addon-links": "^7.6.17",

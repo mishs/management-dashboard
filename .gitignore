@@ -1,8 +1,10 @@
 node_modules/
 .env
 
-# Local task database (synthetic demo data)
+# Local task database (synthetic demo data) and test databases
 server/data/
+frontend/e2e/.tmp/
 
-# Build output
+# Build and test output
 frontend/dist/
+frontend/playwright-report/
