@@ -1,5 +1,8 @@
 node_modules/
 .env
 
+# Local task database (synthetic demo data)
+server/data/
+
 # Build output
 frontend/dist/

@@ -3,8 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
   "scripts": {
     "dev": "cd frontend && vite",
+    "server": "node --disable-warning=ExperimentalWarning server/index.mjs",
+    "start": "node --disable-warning=ExperimentalWarning server/index.mjs",
+    "db:reset:demo": "node --disable-warning=ExperimentalWarning server/reset.mjs --yes",
     "build": "cd frontend && tsc && vite build",
     "preview": "cd frontend && vite preview",
     "format:check": "prettier --check .",
