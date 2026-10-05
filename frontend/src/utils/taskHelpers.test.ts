@@ -1,5 +1,5 @@
 import { calculateAffectedTasks, isValidTaskMove, getNextPriority } from './taskHelpers';
-import { SwimLane, Task } from '../types/task';
+import { SwimLane } from '../types/task';
 import { describe, it, expect } from 'vitest';
 
 const mockTasksWithSwimLane = [

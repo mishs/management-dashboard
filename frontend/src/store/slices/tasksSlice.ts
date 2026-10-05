@@ -35,7 +35,7 @@ const tasksSlice = createSlice({
       targetLane: number;
       newPriority: number;
     }>) => {
-      const { taskId, sourceLane, targetLane, newPriority } = action.payload;
+      const { taskId, sourceLane, targetLane } = action.payload;
       console.log('🔄 Redux moveTask:', { taskId, sourceLane, targetLane });
       
       // Find the task and update it

@@ -15,8 +15,7 @@ import { SavingIndicator } from './SavingIndicator/SavingIndicator';
 import { useGetTasksQuery, useUpdateTasksMutation } from '@store/api/tasksApi';
 import { useDnD } from '@hooks/useDnD';
 import { useAppDispatch, useAppSelector } from '@hooks';
-import { setTasks, setActiveTask, setSaving, moveTask } from '@store/slices/tasksSlice';
-import { calculateAffectedTasks } from '@utils/taskHelpers';
+import { setTasks, setActiveTask, moveTask } from '@store/slices/tasksSlice';
 import { TaskWithSwimLane, LANE_NAMES } from '@types';
 
 export const Dashboard: React.FC = () => {
@@ -48,10 +47,10 @@ export const Dashboard: React.FC = () => {
       return filtered;
     }, [tasks]),
   };
-  const { sensors, draggedId } = useDnD();
+  const { sensors } = useDnD();
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
-    dispatch(setActiveTask(active.id));
+    dispatch(setActiveTask(String(active.id)));
   }, [dispatch]);
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
