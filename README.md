@@ -13,8 +13,8 @@ A modern task management dashboard built with React, TypeScript, Material-UI, Re
 
 - **Drag & Drop**: Intuitive task management with dnd-kit
 - **Three Swim Lanes**: To Do, In Progress, Completed
-- **Priority Recalculation**: Only affected tasks are reprioritized and POSTed
-- **Error Handling**: Notification on failed POST, no optimistic rollback
+- **Saved Moves**: Each move is saved to a local SQLite database and is still there after a reload or a server restart
+- **Honest Save Feedback**: "Saving…", "Saved" only after the server confirms, and a clear "Not saved" message with Retry
 - **Type Safety**: Strict TypeScript throughout
 - **Testing**: Playwright E2E tests for main flows; Vitest/RTL for unit/component
 - **Storybook**: Component documentation and development
@@ -29,21 +29,59 @@ A modern task management dashboard built with React, TypeScript, Material-UI, Re
 - **Testing**: Playwright (E2E), Vitest, React Testing Library
 - **Documentation**: Storybook
 - **Build Tool**: Vite
-- **Mock API**: MSW (Mock Service Worker)
+- **Backend**: small Node.js HTTP API (`server/`) with SQLite via Node's built-in `node:sqlite`
 
 
 ## 📦 Installation
+
+Requires Node.js 22.13 or newer (for the built-in `node:sqlite` module).
 
 ```bash
 npm install
 ```
 
-## 🏃‍♂️ Development
+## 🏃‍♂️ Running the app
 
-Start the development server:
+The board reads and saves tasks through a local API backed by a SQLite file
+(`server/data/demo.sqlite`, created on first start and seeded with synthetic demo tasks).
+
+**One process (built UI + API), http://127.0.0.1:3001:**
 ```bash
-npm run dev
+npm run build
+npm start
 ```
+
+**Development (two terminals), http://localhost:5173:**
+```bash
+npm run server   # API on http://127.0.0.1:3001
+npm run dev      # Vite dev server; forwards /api to the API
+```
+
+Starting the server never overwrites saved changes: demo data is only seeded into an empty database.
+
+### Resetting the demo data
+
+```bash
+npm run db:reset:demo
+```
+
+This explicitly replaces all tasks in `server/data/demo.sqlite` with the original synthetic fixture
+(task 0, "Design wireframes for dashboard", back in To Do). It refuses to touch any database outside
+`server/data/` or the test folder `frontend/e2e/.tmp/`, and it never runs automatically.
+
+### How saving works
+
+- Dropping a card sends one move (`POST /api/tasks/:id/move` with `{operationId, toLane}`). The server moves
+  the task to the top of the destination lane and renumbers both lanes 1..n in a single transaction, then
+  returns the saved board.
+- While the move is being saved, the card shows "Saving…" and further moves are paused.
+- "Saved" (status line and notification) appears only after the server confirms the committed move.
+- If the server answers that the move was refused, or confirms it was not committed, the board returns to
+  the last saved state and shows "Not saved" with **Retry**.
+- If the answer is lost (connection drop or timeout), the app asks the server whether that operation was
+  committed (`GET /api/operations/:id`) before saying anything. If it still cannot tell, it shows
+  "Save not confirmed". Retry re-sends the same operation id, which the server applies at most once.
+- Invalid task ids, lanes or request bodies are rejected without changing stored data.
 
 Run tests:
 ```bash
@@ -60,9 +98,9 @@ Start Storybook:
 npm run storybook
 ```
 
-Playwright test:
+Browser (Playwright) tests:
 ```bash
-npx playwright test
+npm run test:e2e
 ```
 
 
@@ -121,9 +159,9 @@ Following attended as shown under 'All Functional requirement and Non-Functional
     - Tasks prefilled from GET /api/tasks
     - Three swimlanes: To Do, In Progress, Completed
     - Drag-and-drop reorder and move between lanes
-    - Priority recalculation (ascending from 1) after drop
-    - Only affected tasks POSTed to backend
-    - Error notification on failed POST
+    - Priority recalculation (ascending from 1) after drop, saved atomically by the server
+    - Moves saved to a SQLite-backed API; saved state survives reload and server restart
+    - Clear "Not saved" feedback with Retry on a failed save
     - No "Add Task" feature (by design)
   - Non-functional requirements:
     - Strict TypeScript, modular structure
@@ -149,10 +187,9 @@ Following attended as shown under 'All Functional requirement and Non-Functional
   ## 🎯 Key Features (Detailed)
 
 ### Drag & Drop Functionality
-- Move tasks within the same swim lane to reorder
-- Move tasks between different swim lanes
-- Real-time priority updates
-- Optimistic UI updates with error handling
+- Move tasks between swim lanes (the moved task goes to the top of the destination lane)
+- Priorities renumbered and saved together on the server
+- Pending move shown as "Saving…"; on failure the board returns to the last saved state with Retry
 
 ### State Management
 - Redux Toolkit for predictable state management
@@ -168,8 +205,9 @@ Following attended as shown under 'All Functional requirement and Non-Functional
 
 ### Testing Strategy
 - Playwright E2E tests for acceptance criteria
-- Vitest/React Testing Library for unit/component tests (optional, for maintainability)
-- MSW for API mocking
+- Vitest for unit tests (server store and API, save logic, board helpers)
+- Browser tests run against the real API and an isolated SQLite file; failures are simulated only by
+  Playwright request interception inside the tests (there is no switch in the app to make saves fail)
 
 
 ## ⚡️ Important Uncovered Edge Cases
@@ -187,7 +225,7 @@ Following attended as shown under 'All Functional requirement and Non-Functional
 
 ## ⚠️ Missing/WIP Implementation
 
-- No real backend (data is hard-coded)
+- The API is a local, single-user demonstration backend (no authentication)
 - No CI/CD pipeline or automated deployment
 - No user authentication or advanced features
 - No keyboard/ARIA DnD (pointer DnD only)
@@ -195,7 +233,15 @@ Following attended as shown under 'All Functional requirement and Non-Functional
 
 ## 🔧 API Integration
 
-The application uses a mock backend powered by MSW.
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/tasks` | Saved board: `{revision, tasks}` |
+| POST | `/api/tasks/:id/move` | Save a move: body `{operationId, toLane}` (lane 1, 2 or 3) |
+| GET | `/api/operations/:id` | Was this operation committed? (used after a lost response) |
+| GET | `/api/health` | Liveness check |
+
+Errors are JSON `{error: {code, message}}` with a plain-language message. The older MSW handlers in
+`backend/` and `frontend/src/mocks/` are not used by the running app.
 
 ## 🎨 Design System
 
@@ -208,10 +254,21 @@ The application uses Material-UI with a custom theme featuring:
 
 ## 🧪 Testing
 
-Run the full test suite:
+Run the unit tests (server store and API, save logic, helpers):
 ```bash
 npm test
 ```
+
+Run the browser tests (starts Vite and the real API on an isolated test database):
+```bash
+npx playwright install chromium firefox webkit   # first time only
+npm run test:e2e
+```
+
+The browser tests cover: a move confirmed by the server and kept after reload; persistence across an API
+restart; the "Saving…" state with overlapping moves blocked; a known failed save (no false "Saved"), then
+Retry and reload; a lost response that is reconciled without applying the move twice; invalid requests;
+and a load failure with "Try again".
 
 Generate coverage report:
 ```bash
@@ -232,9 +289,20 @@ View component documentation:
 npm run storybook
 ```
 
+## ⚠️ Current Limitations
+
+- The hosted static site (Netlify) only serves the built UI; it does not run the API, so saving
+  works only when the API is running locally (`npm start` or `npm run server`). The deployed site has not
+  been changed by this work.
+- `node:sqlite` is marked experimental by Node.js (the npm scripts hide its warning).
+- One move is saved at a time; other moves wait until the current save finishes.
+- Moves between lanes only; reordering within a lane is not supported.
+- Storybook stories now need the API to show data; `npm run build-storybook` fails for an unrelated,
+  pre-existing reason (`__dirname` in `frontend/.storybook/main.ts`).
+
 ## 🚀 Future Enhancements
 
-- [ ] Move task data to a real backend/database (currently hard-coded for demo)
+- [x] Save task moves to a local SQLite-backed API (demo scope; not deployed)
 - [ ] Add task creation and editing
 - [ ] User authentication and roles
 - [ ] Real-time collaboration (WebSockets)

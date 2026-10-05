@@ -18,6 +18,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "@store": ["./src/store"],
+      "@theme": ["./src/theme"],
+      "@types": ["./src/types"],
+      "@hooks": ["./src/hooks"],
       "@store/*": ["./src/store/*"],
       "@theme/*": ["./src/theme/*"],
       "@components/*": ["./src/components/*"],

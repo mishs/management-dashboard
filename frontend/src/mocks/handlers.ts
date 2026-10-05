@@ -1,5 +1,38 @@
 import { http, HttpResponse } from 'msw';
-const mockTasks = {
+import type { Task } from '../types';
+
+// Browser mock of the original bulk-update API (MSW). The running app uses the
+// real API in server/; this mock is kept for component work without a backend.
+
+type LaneId = 1 | 2 | 3;
+type Board = Record<LaneId, Task[]>;
+const LANES: readonly LaneId[] = [1, 2, 3];
+
+export interface TaskUpdate {
+  id: number;
+  taskName: string;
+  priority: number;
+  swimLane: LaneId;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const isLaneId = (value: unknown): value is LaneId => LANES.some((lane) => lane === value);
+
+/** Validates the request body instead of trusting a cast. */
+export const isTaskUpdateList = (value: unknown): value is TaskUpdate[] =>
+  Array.isArray(value) &&
+  value.every(
+    (item) =>
+      isRecord(item) &&
+      Number.isInteger(item.id) &&
+      typeof item.taskName === 'string' &&
+      Number.isInteger(item.priority) &&
+      isLaneId(item.swimLane),
+  );
+
+const mockTasks: Board = {
   1: [
     {
       id: 0,
@@ -98,63 +131,46 @@ const mockTasks = {
   ],
 };
 
-let tasks = { ...mockTasks };
+// Deep copy: updates must not change the original fixture used as a fallback.
+let tasks: Board = structuredClone(mockTasks);
 
 export const handlers = [
   http.get('/api/tasks', () => {
     return HttpResponse.json(tasks);
   }),
-  
+
   http.post('/api/tasks', async ({ request }) => {
+    let body: unknown;
     try {
-      const updatedTasks = await request.json() as Array<{
-        id: number;
-        taskName: string;
-        priority: number;
-        swimLane: number;
-      }>;
-      updatedTasks.forEach((updatedTask) => {
-        console.log('updatedTasks - in handler [Requirement Check] Only affected tasks sent to backend:', updatedTask);
-      });
-      updatedTasks.forEach((updatedTask) => {
-        Object.keys(tasks).forEach((laneKey) => {
-          const lane = laneKey;
-          const laneTasks = (tasks as any)[lane];
-          const taskIndex = laneTasks.findIndex((task: any) => task.id === updatedTask.id);
-          if (taskIndex !== -1) {
-            if (parseInt(lane) !== updatedTask.swimLane) {
-              laneTasks.splice(taskIndex, 1);
-            } else {
-              laneTasks[taskIndex] = {
-                ...laneTasks[taskIndex],
-                ...updatedTask
-              };
-            }
-          }
-        });
-        const targetLane = String(updatedTask.swimLane);
-        const targetLaneTasks = (tasks as any)[targetLane];
-        if (!targetLaneTasks.find((task: any) => task.id === updatedTask.id)) {
-          const originalTask = Object.values(mockTasks).flat().find((task: any) => task.id === updatedTask.id);
-          if (originalTask) {
-            targetLaneTasks.push({
-              ...originalTask,
-              ...updatedTask
-            });
-          }
-        }
-      });
-      
-      Object.keys(tasks).forEach((laneKey) => {
-        const laneTasks = (tasks as any)[laneKey];
-        laneTasks.sort((a: any, b: any) => a.priority - b.priority);
-      });
-      return HttpResponse.json(tasks);
-    } catch (error) {
-      return new HttpResponse(null, {
-        status: 400,
-        statusText: (error as Error).message,
-      });
+      body = await request.json();
+    } catch {
+      return HttpResponse.json({ error: 'The request body is not valid JSON.' }, { status: 400 });
     }
+    if (!isTaskUpdateList(body)) {
+      return HttpResponse.json({ error: 'Expected a list of task updates.' }, { status: 400 });
+    }
+
+    for (const update of body) {
+      for (const lane of LANES) {
+        const laneTasks = tasks[lane];
+        const index = laneTasks.findIndex((task) => task.id === update.id);
+        if (index === -1) continue;
+        if (lane !== update.swimLane) laneTasks.splice(index, 1);
+        else laneTasks[index] = { ...laneTasks[index], ...update };
+      }
+      const target = tasks[update.swimLane];
+      if (!target.some((task) => task.id === update.id)) {
+        const original = LANES.flatMap((lane) => mockTasks[lane]).find((task) => task.id === update.id);
+        if (original) target.push({ ...original, ...update });
+      }
+    }
+
+    for (const lane of LANES) tasks[lane].sort((a, b) => a.priority - b.priority);
+    return HttpResponse.json(tasks);
   }),
 ];
+
+/** Test helper: restore the mock board to the fixture. */
+export const resetMockTasks = () => {
+  tasks = structuredClone(mockTasks);
+};

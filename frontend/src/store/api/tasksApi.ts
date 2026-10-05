@@ -1,134 +1,33 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { TasksResponse, TaskWithSwimLane } from '../../types';
-const mockTasksData: TasksResponse = {
-  1: [
-    {
-      id: 0,
-      taskName: 'Design wireframes for dashboard',
-      priority: 1,
-      description: 'Create initial wireframes for the task management dashboard',
-      assignee: 'Alex Chen',
-      dueDate: '2024-12-15',
-      tags: ['design', 'wireframes'],
-      priorityLevel: 'High',
-    },
-    {
-      id: 1,
-      taskName: 'Implement drag and drop functionality',
-      priority: 2,
-      description: 'Add dnd-kit library and implement task reordering',
-      assignee: 'Sarah Kim',
-      dueDate: '2024-12-18',
-      tags: ['development', 'frontend'],
-      priorityLevel: 'High',
-    },
-    {
-      id: 2,
-      taskName: 'Set up Redux store',
-      priority: 3,
-      description: 'Configure Redux Toolkit with RTK Query for state management',
-      assignee: 'Mike Johnson',
-      dueDate: '2024-12-20',
-      tags: ['development', 'state'],
-      priorityLevel: 'Medium',
-    },
-    {
-      id: 3,
-      taskName: 'Create responsive layout',
-      priority: 4,
-      description: 'Ensure dashboard works on mobile and tablet devices',
-      assignee: 'Emma Davis',
-      dueDate: '2024-12-22',
-      tags: ['design', 'responsive'],
-      priorityLevel: 'Medium',
-    },
-    {
-      id: 4,
-      taskName: 'Write unit tests',
-      priority: 5,
-      description: 'Add comprehensive test coverage for components',
-      assignee: 'Tom Wilson',
-      dueDate: '2024-12-25',
-      tags: ['testing', 'quality'],
-      priorityLevel: 'Low',
-    },
-  ],
-  2: [
-    {
-      id: 5,
-      taskName: 'API integration testing',
-      priority: 1,
-      description: 'Test mock service worker integration',
-      assignee: 'Lisa Brown',
-      dueDate: '2024-12-16',
-      tags: ['testing', 'api'],
-      priorityLevel: 'High',
-    },
-    {
-      id: 6,
-      taskName: 'Performance optimization',
-      priority: 2,
-      description: 'Optimize rendering and reduce bundle size',
-      assignee: 'David Lee',
-      dueDate: '2024-12-19',
-      tags: ['performance', 'optimization'],
-      priorityLevel: 'Medium',
-    },
-  ],
-  3: [
-    {
-      id: 7,
-      taskName: 'Documentation review',
-      priority: 1,
-      description: 'Review and update project documentation',
-      assignee: 'Anna Taylor',
-      dueDate: '2024-12-14',
-      tags: ['documentation'],
-      priorityLevel: 'Low',
-    },
-    {
-      id: 8,
-      taskName: 'Code review process',
-      priority: 2,
-      description: 'Establish code review guidelines and process',
-      assignee: 'Chris Anderson',
-      dueDate: '2024-12-17',
-      tags: ['process', 'quality'],
-      priorityLevel: 'Medium',
-    },
-  ],
-};
+import type { BoardResponse, MoveRequest } from '../../types';
+
+/** A save that has not answered within this time is treated as "outcome unknown" and reconciled. */
+export const REQUEST_TIMEOUT_MS = 10_000;
 
 export const tasksApi = createApi({
   reducerPath: 'tasksApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: '/api',
-    prepareHeaders: (headers) => {
-      headers.set('Content-Type', 'application/json');
-      return headers;
-    },
-  }),
-  tagTypes: ['Tasks'],
-  refetchOnMountOrArgChange: false,
+  // Same-origin API (absolute so it also resolves outside a browser page, e.g. in unit tests).
+  baseQuery: fetchBaseQuery({ baseUrl: `${globalThis.location?.origin ?? ''}/api`, timeout: REQUEST_TIMEOUT_MS }),
   refetchOnFocus: false,
   refetchOnReconnect: false,
   endpoints: (builder) => ({
-    getTasks: builder.query<TasksResponse, void>({
-      queryFn: async () => {
-        console.log('📡 API: Returning mock data');
-        return { data: mockTasksData };
-      },
-      providesTags: ['Tasks'],
+    getTasks: builder.query<BoardResponse, void>({
+      query: () => '/tasks',
       keepUnusedDataFor: 0,
     }),
-    updateTasks: builder.mutation<{ status: number }, Partial<TaskWithSwimLane>[]>({
-      queryFn: async (tasks) => {
-        console.log('Dashboard- Updating tasks:', tasks);
-        return { data: { status: 200 } };
-      },
-      invalidatesTags: ['Tasks'],
+    moveTask: builder.mutation<BoardResponse, MoveRequest>({
+      query: ({ taskId, operationId, toLane }) => ({
+        url: `/tasks/${taskId}/move`,
+        method: 'POST',
+        body: { operationId, toLane },
+      }),
+    }),
+    // Asks whether a specific move was committed (used after a lost response).
+    getOperation: builder.query<BoardResponse, string>({
+      query: (operationId) => `/operations/${encodeURIComponent(operationId)}`,
+      keepUnusedDataFor: 0,
     }),
   }),
 });
 
-export const { useGetTasksQuery, useUpdateTasksMutation } = tasksApi;
+export const { useGetTasksQuery } = tasksApi;

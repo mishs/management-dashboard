@@ -9,9 +9,12 @@ import { getLaneStats } from '@utils/taskHelpers';
 interface SwimLaneProps {
   laneId: 1 | 2 | 3;
   tasks: TaskWithSwimLane[];
+  /** True while a save is in progress: further moves wait for it. */
+  dragDisabled?: boolean;
+  savingTaskId?: number | null;
 }
 
-export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
+export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks, dragDisabled = false, savingTaskId = null }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: laneId.toString(),
   });
@@ -185,7 +188,7 @@ export const SwimLane: React.FC<SwimLaneProps> = ({ laneId, tasks }) => {
           <SortableContext items={tasks.map(task => task.id.toString())} strategy={verticalListSortingStrategy}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {tasks.map((task) => (
-                <TaskCard key={task.id} task={task} />
+                <TaskCard key={task.id} task={task} disabled={dragDisabled} saving={task.id === savingTaskId} />
               ))}
             </Box>
           </SortableContext>

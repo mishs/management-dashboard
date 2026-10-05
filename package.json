@@ -3,14 +3,21 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
   "scripts": {
     "dev": "cd frontend && vite",
+    "server": "node --disable-warning=ExperimentalWarning server/index.mjs",
+    "start": "node --disable-warning=ExperimentalWarning server/index.mjs",
+    "db:reset:demo": "node --disable-warning=ExperimentalWarning server/reset.mjs --yes",
     "build": "cd frontend && tsc && vite build",
     "preview": "cd frontend && vite preview",
     "format:check": "prettier --check .",
-    "test": "cd frontend && vitest",
-    "test:ui": "cd frontend && vitest --ui",
-    "test:coverage": "cd frontend && vitest --coverage",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test -c frontend/playwright.config.ts",
     "storybook": "cd frontend && storybook dev -p 6006",
     "build-storybook": "cd frontend && storybook build"
   },
@@ -32,6 +39,7 @@
     "sonner": "^1.7.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@storybook/addon-essentials": "^7.6.17",
     "@storybook/addon-interactions": "^7.6.17",
     "@storybook/addon-links": "^7.6.17",

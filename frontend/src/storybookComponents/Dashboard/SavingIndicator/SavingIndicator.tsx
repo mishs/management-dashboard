@@ -1,7 +1,11 @@
 import React from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 
-export const SavingIndicator: React.FC = () => {
+interface SavingIndicatorProps {
+  message?: React.ReactNode;
+}
+
+export const SavingIndicator: React.FC<SavingIndicatorProps> = ({ message = 'Saving changes...' }) => {
   return (
     <Box
       sx={{
@@ -16,6 +20,7 @@ export const SavingIndicator: React.FC = () => {
       <CircularProgress
         size={16}
         thickness={4}
+        aria-hidden
         sx={{
           mr: 1,
           color: 'var(--mui-primary)',
@@ -31,7 +36,7 @@ export const SavingIndicator: React.FC = () => {
           fontFamily: 'Inter, Roboto, sans-serif',
         }}
       >
-        Saving changes...
+        {message}
       </Typography>
     </Box>
   );

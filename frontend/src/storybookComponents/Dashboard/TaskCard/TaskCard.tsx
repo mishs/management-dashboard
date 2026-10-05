@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { Box, Card, CardContent, Typography, Chip, Stack } from '@mui/material';
+import { Box, Card, CardContent, Typography, Chip, Stack, CircularProgress } from '@mui/material';
 import { DragIndicator } from '@mui/icons-material';
 import { TaskWithSwimLane } from '@types';
 import { formatDate } from '@utils/taskHelpers';
@@ -8,9 +8,13 @@ import { formatDate } from '@utils/taskHelpers';
 interface TaskCardProps {
   task: TaskWithSwimLane;
   isDragging?: boolean;
+  /** Moves are paused while another change is being saved. */
+  disabled?: boolean;
+  /** This card's move is being saved right now. */
+  saving?: boolean;
 }
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, disabled = false, saving = false }) => {
   const {
     attributes,
     listeners,
@@ -20,6 +24,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
   } = useDraggable({
     id: task.id.toString(),
     data: { task },
+    disabled,
   });
 
   const style = transform
@@ -59,8 +64,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
       {...listeners}
       {...attributes}
       data-testid={`task-card-${task.id}`}
+      aria-busy={saving || undefined}
       sx={{
-        cursor: isDragging ? 'grabbing' : 'grab',
+        cursor: isDragging ? 'grabbing' : disabled ? 'progress' : 'grab',
         backgroundColor: 'background.paper',
         border: '1px solid',
         borderColor: 'grey.200',
@@ -114,6 +120,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
           )}
         </Box>
 
+        {saving && (
+          <Chip
+            data-testid={`task-saving-${task.id}`}
+            icon={<CircularProgress size={12} thickness={5} aria-hidden />}
+            label="Saving…"
+            size="small"
+            variant="outlined"
+            color="primary"
+            sx={{ mb: 1.5, fontWeight: 600 }}
+          />
+        )}
+
         {/* Description */}
         {task.description && (
           <Typography
@@ -162,7 +180,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false }) 
         {/* Tags */}
         {task.tags && task.tags.length > 0 && (
           <Stack direction="row" spacing={0.5} sx={{ mb: 1.5, flexWrap: 'wrap', gap: 0.5 }}>
-            {task.tags.map((tag, index) => (
+            {task.tags.map((tag: string, index: number) => (
               <Chip
                 key={index}
                 label={tag}
