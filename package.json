@@ -14,9 +14,9 @@
     "build": "cd frontend && tsc && vite build",
     "preview": "cd frontend && vite preview",
     "format:check": "prettier --check .",
-    "test": "cd frontend && vitest",
-    "test:ui": "cd frontend && vitest --ui",
-    "test:coverage": "cd frontend && vitest --coverage",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
     "storybook": "cd frontend && storybook dev -p 6006",
     "build-storybook": "cd frontend && storybook build"
   },
