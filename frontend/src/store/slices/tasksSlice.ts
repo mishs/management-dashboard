@@ -1,119 +1,85 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TaskWithSwimLane } from '../../types';
-import { tasksApi } from '../api/tasksApi';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { BoardResponse, LaneId, TaskWithSwimLane } from '../../types';
+import { applyMove } from '../../utils/boardHelpers';
 
-interface TasksState {
-  tasks: TaskWithSwimLane[];
-  activeTask: string | null;
-  saving: boolean;
+export interface MoveIntent {
+  operationId: string;
+  taskId: number;
+  taskName: string;
+  fromLane: LaneId;
+  toLane: LaneId;
 }
 
-const initialState: TasksState = {
-  tasks: [],
-  activeTask: null,
-  saving: false,
+/**
+ * - not-saved:   the server confirmed the move was not committed.
+ * - unconfirmed: no reliable answer (connection lost / timeout); it may or may not be saved.
+ *                Retry re-sends the same operation id, which the server de-duplicates.
+ * - rejected:    the server refused the move (e.g. invalid request); retrying would not help.
+ */
+export type SaveFailure = 'not-saved' | 'unconfirmed' | 'rejected';
+
+export type SaveState =
+  | { status: 'idle' }
+  | { status: 'saving'; intent: MoveIntent }
+  | { status: 'saved'; intent: MoveIntent }
+  | { status: 'failed'; intent: MoveIntent; failure: SaveFailure; serverMessage?: string };
+
+export interface TasksState {
+  /** Last state confirmed by the server - never contains unsaved changes. */
+  tasks: TaskWithSwimLane[];
+  revision: number;
+  loaded: boolean;
+  activeTask: string | null;
+  save: SaveState;
+}
+
+const initialState: TasksState = { tasks: [], revision: -1, loaded: false, activeTask: null, save: { status: 'idle' } };
+
+// An older response must never overwrite a newer confirmed board.
+const acceptBoard = (state: TasksState, board: BoardResponse) => {
+  if (state.loaded && board.revision < state.revision) return;
+  state.tasks = board.tasks;
+  state.revision = board.revision;
+  state.loaded = true;
 };
+const isCurrent = (state: TasksState, intent: MoveIntent) =>
+  state.save.status !== 'idle' && state.save.intent.operationId === intent.operationId;
 
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    setTasks: (state, action: PayloadAction<TaskWithSwimLane[]>) => {
-      console.log('🏪 Redux setTasks:', action.payload.length);
-      state.tasks = action.payload;
-    },
+    boardReceived: (state, action: PayloadAction<BoardResponse>) => acceptBoard(state, action.payload),
     setActiveTask: (state, action: PayloadAction<string | null>) => {
-      console.log('🎯 Redux setActiveTask:', action.payload);
       state.activeTask = action.payload;
     },
-    setSaving: (state, action: PayloadAction<boolean>) => {
-      state.saving = action.payload;
+    saveStarted: (state, action: PayloadAction<MoveIntent>) => {
+      state.save = { status: 'saving', intent: action.payload };
     },
-    moveTask: (state, action: PayloadAction<{
-      taskId: number;
-      sourceLane: number;
-      targetLane: number;
-      newPriority: number;
-    }>) => {
-      const { taskId, sourceLane, targetLane } = action.payload;
-      console.log('🔄 Redux moveTask:', { taskId, sourceLane, targetLane });
-      
-      // Find the task and update it
-      const taskIndex = state.tasks.findIndex(t => t.id === taskId);
-      if (taskIndex === -1) {
-        console.log('❌ Redux: Task not found:', taskId);
-        return;
-      }
-      
-      console.log('📍 Found task at index:', taskIndex, 'current lane:', state.tasks[taskIndex].swimLane);
-      
-      // Create a new task object with updated swim lane (immutable update)
-      state.tasks[taskIndex] = {
-        ...state.tasks[taskIndex],
-        swimLane: targetLane as 1 | 2 | 3,
-      };
-      console.log('✅ Updated task swimLane to:', targetLane);
-      
-      // Recompute priorities for all tasks in both lanes
-      const sourceTasks = state.tasks.filter(t => t.swimLane === sourceLane);
-      const targetTasks = state.tasks.filter(t => t.swimLane === targetLane);
-      console.log('📊 Lane counts after move:', {
-        sourceLane,
-        sourceCount: sourceTasks.length,
-        targetLane,
-        targetCount: targetTasks.length,
-      });
-      
-      // Update priorities for source lane
-      sourceTasks
-        .sort((a, b) => a.priority - b.priority)
-        .forEach((task, index) => {
-          const idx = state.tasks.findIndex(t => t.id === task.id);
-          if (idx !== -1) {
-            state.tasks[idx] = {
-              ...state.tasks[idx],
-              priority: index + 1,
-            };
-          }
-        });
-      
-      // Update priorities for target lane
-      targetTasks
-        .sort((a, b) => a.priority - b.priority)
-        .forEach((task, index) => {
-          const idx = state.tasks.findIndex(t => t.id === task.id);
-          if (idx !== -1) {
-            state.tasks[idx] = {
-              ...state.tasks[idx],
-              priority: index + 1,
-            };
-          }
-        });
-      console.log('✅ Redux moveTask completed');
+    saveSucceeded: (state, action: PayloadAction<{ intent: MoveIntent; board: BoardResponse }>) => {
+      acceptBoard(state, action.payload.board);
+      if (isCurrent(state, action.payload.intent)) state.save = { status: 'saved', intent: action.payload.intent };
     },
-  },
-  extraReducers: (builder) => {
-    // Initialize tasks from API only once
-    builder.addMatcher(
-      tasksApi.endpoints.getTasks.matchFulfilled,
-      (state, action) => {
-        console.log('📡 API response received, local tasks:', state.tasks.length);
-        if (state.tasks.length === 0) {
-          const transformedTasks: TaskWithSwimLane[] = Object.entries(action.payload).flatMap(([laneId, laneTasks]) =>
-            laneTasks.map((task: any) => ({
-              ...task,
-              swimLane: parseInt(laneId) as 1 | 2 | 3,
-            }))
-          );
-          console.log('📥 Initializing tasks from API:', transformedTasks.length);
-          state.tasks = transformedTasks;
-        } else {
-          console.log('⏭️ Skipping API data, using existing local tasks');
-        }
-      }
-    );
+    saveFailed: (
+      state,
+      action: PayloadAction<{ intent: MoveIntent; failure: SaveFailure; serverMessage?: string; board?: BoardResponse }>,
+    ) => {
+      const { intent, failure, serverMessage, board } = action.payload;
+      if (board) acceptBoard(state, board);
+      if (isCurrent(state, intent)) state.save = { status: 'failed', intent, failure, serverMessage };
+    },
+    dismissSaveStatus: (state) => {
+      if (state.save.status !== 'saving') state.save = { status: 'idle' };
+    },
   },
 });
 
-export const { setTasks, setActiveTask, setSaving, moveTask } = tasksSlice.actions;
+export const { boardReceived, setActiveTask, saveStarted, saveSucceeded, saveFailed, dismissSaveStatus } =
+  tasksSlice.actions;
 export default tasksSlice.reducer;
+
+/** What the board shows: confirmed tasks, plus the in-flight move while it is being saved. */
+export const selectVisibleTasks = createSelector(
+  [(state: { tasks: TasksState }) => state.tasks.tasks, (state: { tasks: TasksState }) => state.tasks.save],
+  (tasks, save) => (save.status === 'saving' ? applyMove(tasks, save.intent.taskId, save.intent.toLane) : tasks),
+);

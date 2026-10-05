@@ -50,3 +50,17 @@ export const LANE_COLORS = {
   2: '#ff9800', // Orange
   3: '#2e7d32'  // MUI Success Green
 } as const;
+export type LaneId = keyof typeof LANE_NAMES;
+
+/** Board as confirmed by the server. `revision` increases with every committed move. */
+export interface BoardResponse {
+  revision: number;
+  tasks: TaskWithSwimLane[];
+  operation?: { id: string; applied: boolean; replayed?: boolean };
+}
+
+export interface MoveRequest {
+  operationId: string;
+  taskId: number;
+  toLane: LaneId;
+}

@@ -4,6 +4,13 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  // The task API (server/index.mjs) runs separately; the dev server forwards /api to it.
+  server: {
+    proxy: { '/api': process.env.API_PROXY_TARGET ?? 'http://127.0.0.1:3001' },
+  },
+  preview: {
+    proxy: { '/api': process.env.API_PROXY_TARGET ?? 'http://127.0.0.1:3001' },
+  },
   build: {
     rollupOptions: {
       output: {
