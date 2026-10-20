@@ -1,5 +1,7 @@
 # Complexity, Gotchas & Implementation Notes
 
+> **Status (October 2026):** most of these notes date from the earlier MSW mock-backend phase. The running app now saves moves through a Node.js API with SQLite (`server/`), with operation IDs and a status check for uncertain outcomes. See the [README](README.md) and [ADR 0001](docs/adr/0001-reconcile-408-write-outcomes.md). Notes about the mock backend, hard-coded data and "no real persistence" describe that earlier phase, not the current app.
+
 ## Introduction
 This document is intended for current and future team members working on the "My Fancy Task Dashboard" codebase. Its purpose is to highlight areas of complexity, non-mainstream implementation details, and known gotchas encountered during development. The goal is to accelerate onboarding, reduce friction, and provide a reference for troubleshooting and future enhancements.
 
