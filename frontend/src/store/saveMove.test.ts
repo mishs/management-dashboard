@@ -69,6 +69,17 @@ describe('saveMove', () => {
     expect(lane(2)).toEqual([0, 5]);
   });
 
+  it('after a 408 timeout, asks the server and reports "saved" if the move was committed', async () => {
+    fetchMock
+      .mockResolvedValueOnce(json(408, { error: { code: 'timeout', message: 'Request timed out.' } }))
+      .mockResolvedValueOnce(json(200, { ...afterMove, operation: { id: intent.operationId, applied: true } }));
+    await store.dispatch(saveMove(intent));
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(urlOf(fetchMock.mock.calls[1][0])).toMatch(/\/api\/operations\/op-test-0001$/);
+    expect(store.getState().tasks.save.status).toBe('saved');
+    expect(lane(2)).toEqual([0, 5]);
+  });
+
   it('reports "not saved" when the server confirms the move was not committed', async () => {
     fetchMock
       .mockResolvedValueOnce(json(503, { error: { code: 'unavailable', message: 'Unavailable.' } }))
