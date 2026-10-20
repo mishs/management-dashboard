@@ -8,3 +8,6 @@ frontend/e2e/.tmp/
 # Build and test output
 frontend/dist/
 frontend/playwright-report/
+
+# Storybook debug output
+debug-storybook.log
