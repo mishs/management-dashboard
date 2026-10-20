@@ -3,10 +3,11 @@
 
 A modern task management dashboard built with React, TypeScript, Material-UI, Redux Toolkit, dnd-kit, and Playwright E2E tests. Implements all requirements from the Combined Specification (see below).
 
- ## 📹 Demo & Live Link
+## Case study and links
 
-- [Demo Video](#) <!-- Add your video link here -->
-- [Live Project](#) <!-- Add your deployed link here -->
+- **Case study:** [AI-assisted reliability review: telling a timeout from a rejected write](docs/case-studies/ai-assisted-reliability-review.md) (constrained Claude Code sessions, test first, human-reviewed)
+- **Decision record:** [ADR 0001: treat HTTP 408 on a move as an unknown outcome](docs/adr/0001-reconcile-408-write-outcomes.md)
+- **Static UI preview:** [modernmanagmentdashboard.netlify.app](https://modernmanagmentdashboard.netlify.app/). This is the interface only; saving moves needs the local API (see Getting started)
 
 
 ## 🚀 Features (summarised)
