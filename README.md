@@ -6,6 +6,7 @@ A modern task management dashboard built with React, TypeScript, Material-UI, Re
 ## Case study and links
 
 - **Case study:** [AI-assisted reliability review: telling a timeout from a rejected write](docs/case-studies/ai-assisted-reliability-review.md) (constrained Claude Code sessions, test first, human-reviewed)
+- **Video walkthrough (88 s):** [Fixing a silent save failure: AI-assisted debugging with Claude Code](https://youtu.be/md7NpRTJ2MA)
 - **Decision record:** [ADR 0001: treat HTTP 408 on a move as an unknown outcome](docs/adr/0001-reconcile-408-write-outcomes.md)
 - **Static UI preview:** [modernmanagmentdashboard.netlify.app](https://modernmanagmentdashboard.netlify.app/). This is the interface only; saving moves needs the local API (see Getting started)
 
