@@ -4,6 +4,7 @@
 Node/SQLite task board. I added a failing regression test for ambiguous HTTP 408 responses, then corrected the failure
 classification to reuse the existing operation-status endpoint. I reviewed every diff and ran every check myself before committing.
 
+- **Video walkthrough (88 s):** [Fixing a silent save failure: AI-assisted debugging with Claude Code](https://youtu.be/md7NpRTJ2MA)
 - **Decision record:** [ADR 0001](../adr/0001-reconcile-408-write-outcomes.md)
 - **Working rules given to the AI:** [`CLAUDE.md`](../../CLAUDE.md)
 - **Commits, in order:** rules [`0f4b1e7`](https://github.com/mishs/management-dashboard/commit/0f4b1e7) → failing test [`b044f03`](https://github.com/mishs/management-dashboard/commit/b044f03) → fix [`0d01cd6`](https://github.com/mishs/management-dashboard/commit/0d01cd6)
