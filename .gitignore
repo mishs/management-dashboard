@@ -11,3 +11,6 @@ frontend/playwright-report/
 
 # Storybook debug output
 debug-storybook.log
+
+# Local Netlify folder
+.netlify
